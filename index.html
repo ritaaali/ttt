@@ -190,6 +190,88 @@
   details.talent-detail summary{
     cursor:pointer; font-size:13px; color:var(--ink-soft); margin: 4px 0 18px 0; text-align:right;
   }
+
+  .talent-chip{ cursor:pointer; -webkit-user-select:none; user-select:none; }
+  .talent-chip:active{ opacity:0.75; transform: scale(0.98); }
+
+  /* ---- 天賦詳情彈窗 ---- */
+  .modal-backdrop{
+    position: fixed; inset:0;
+    background: rgba(20,18,14,0.45);
+    opacity:0; pointer-events:none;
+    transition: opacity .2s ease;
+    z-index: 50;
+  }
+  .modal-sheet{
+    position: fixed; left:0; right:0; bottom:0;
+    max-width: 720px; margin: 0 auto;
+    background: var(--paper);
+    border-radius: 20px 20px 0 0;
+    max-height: 86vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateY(100%);
+    transition: transform .28s cubic-bezier(.2,.8,.3,1);
+    z-index: 51;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+  }
+  #talentModal.show .modal-backdrop{ opacity:1; pointer-events:auto; }
+  #talentModal.show .modal-sheet{ transform: translateY(0); }
+
+  .modal-handle{
+    width:44px; height:5px; background:var(--line); border-radius:3px;
+    margin: 12px auto 4px auto;
+  }
+  .modal-close{
+    position: absolute; top: 14px; right: 18px;
+    background:none; border:none; font-size:22px; color:var(--ink-soft);
+    line-height:1; padding:6px;
+    z-index: 5;
+  }
+
+  #talentModalBody{ padding: 10px 26px 10px 26px; position:relative; }
+  .tm-rank{
+    width:52px; height:52px; border-radius:50%;
+    background: var(--accent); color:#fff;
+    font-family:'NotoSerifTC',serif; font-weight:700; font-size:24px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 14px;
+  }
+  .tm-title-row{ display:flex; align-items:baseline; gap:14px; margin-bottom:8px; }
+  .tm-zh{ font-family:'NotoSerifTC',serif; font-size:36px; font-weight:700; }
+  .tm-en{ font-size:16px; color:var(--ink-soft); font-style:italic; }
+  .tm-domain{
+    display:inline-block; font-size:13px; font-weight:700; letter-spacing:1px;
+    padding:4px 14px; border-radius:20px;
+    background: var(--accent-bg); color: var(--accent);
+    margin-bottom:20px;
+  }
+  .tm-def{
+    font-size:17px; line-height:1.85; margin-bottom: 24px;
+    padding-bottom:22px; border-bottom:2px solid var(--line);
+  }
+  .tm-sec{ margin-bottom:22px; }
+  .tm-sec h4{
+    font-family:'NotoSerifTC',serif; font-size:17px; color:var(--accent);
+    margin-bottom:10px; display:flex; align-items:center; gap:8px;
+  }
+  .tm-sec h4::before{
+    content:''; width:9px; height:9px; background:var(--accent); border-radius:2px; display:inline-block;
+  }
+  .tm-sec ul{ list-style:none; padding:0; }
+  .tm-sec ul li{
+    font-size:15.5px; line-height:1.75; padding-left:20px; position:relative; margin-bottom:8px;
+  }
+  .tm-sec ul li::before{ content:'—'; position:absolute; left:0; color:var(--ink-soft); }
+  .tm-sec p{ font-size:15.5px; line-height:1.75; }
+  .tm-summary{
+    background: var(--accent-bg); border-radius:12px; padding:20px 22px;
+    font-size:16px; line-height:1.8; margin-top: 6px;
+  }
+  .tm-summary .lbl{
+    display:block; font-weight:700; color:var(--accent);
+    font-family:'NotoSerifTC',serif; font-size:16.5px; margin-bottom:8px;
+  }
 </style>
 </head>
 <body>
@@ -203,7 +285,7 @@
 <div class="wrap">
 
   <div class="talents-section">
-    <div class="talents-title"><span class="bar" style="background:var(--green)"></span>我的優勢特質 Top 8</div>
+    <div class="talents-title"><span class="bar" style="background:var(--green)"></span>我的優勢特質 Top 8　<span style="font-size:11px;color:var(--ink-soft);font-weight:400;">（點卡片看詳細內容）</span></div>
     <div class="talent-scroll" id="talentScroll"></div>
   </div>
 
@@ -260,17 +342,81 @@
 
 <div class="toast" id="toast">已儲存 ✓</div>
 
+<div id="talentModal">
+  <div class="modal-backdrop" id="talentModalBackdrop"></div>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="modal-close" id="talentModalClose">✕</button>
+    <div id="talentModalBody"></div>
+  </div>
+</div>
+
 <script>
   // ---------- 8 項優勢資料（供上方速覽卡片使用）----------
   const TALENTS = [
-    {rank:1, zh:"交往", en:"Relator", domain:"關係建立", accent:"var(--green)"},
-    {rank:2, zh:"伯樂", en:"Developer", domain:"關係建立", accent:"var(--green)"},
-    {rank:3, zh:"同理", en:"Empathy", domain:"關係建立", accent:"var(--green)"},
-    {rank:4, zh:"謹慎", en:"Deliberative", domain:"執行力", accent:"var(--blue)"},
-    {rank:5, zh:"排難", en:"Restorative", domain:"執行力", accent:"var(--blue)"},
-    {rank:6, zh:"完美", en:"Maximizer", domain:"影響力", accent:"var(--purple)"},
-    {rank:7, zh:"責任", en:"Responsibility", domain:"執行力", accent:"var(--blue)"},
-    {rank:8, zh:"連結", en:"Connectedness", domain:"思維力", accent:"var(--brown)"},
+    {rank:1, zh:"交往", en:"Relator", domain:"關係建立", accent:"var(--green)", accentBg:"var(--green-bg)",
+     def:"喜歡深而真的關係，通常不追求大量表面的互動，而是更在意能否和少數重要的人建立深度連結與真誠合作。",
+     why:["重視信任建立，而不是快速熟絡","和熟悉的人一起工作時，會投入得更深、更久","傾向珍惜長期而真實的友誼"],
+     success:"能建立高信任的合作關係，這種關係一旦建立，通常穩定、深入，而且非常有支持力。",
+     actions:["多安排一對一而非大群體的深度互動","持續經營真正重要的關係，不要因忙碌而斷線","在團隊中示範真誠與忠誠","適度打開圈子，保留接觸新人的可能"],
+     blind:["建立信任較慢，可能讓人覺得難靠近","容易把時間都放在熟人身上，而顯得排外","若圈子太封閉，會錯過新的資源與連結"],
+     summary:"交往的核心是「深度連結、真誠互信」。當你保有深度也保有適度開放，關係資本會更完整。"},
+
+    {rank:2, zh:"伯樂", en:"Developer", domain:"關係建立", accent:"var(--green)", accentBg:"var(--green-bg)",
+     def:"喜歡看見他人成長，尤其擅長注意到細微進步。別人可能還沒看見自己的可能性時，你已經能看見。",
+     why:["會自然對他人的潛力感到興趣","對小進步非常敏感，且真心為此高興","常在關係中扮演鼓勵者、教練或培育者角色"],
+     success:"能讓人感到被看見、被相信，這會明顯提升他們的成長動機。你帶來的不只是支持，而是成長感。",
+     actions:["列出你真正想培育的人，固定投入時間","給需要鼓勵的人更具體的回饋","把焦點放在有成長意願的人身上","不要忘記同時投資自己的發展"],
+     blind:["可能對他人的成長過度投入，甚至替對方扛責任","若對方一直沒有行動，你可能耗損很大","容易把太多注意力放在別人身上，而忽略自己"],
+     summary:"伯樂的核心是「看見潛力、陪伴成長」。當你把鼓勵與界線放在一起，培育效果會更健康。"},
+
+    {rank:3, zh:"同理", en:"Empathy", domain:"關係建立", accent:"var(--green)", accentBg:"var(--green-bg)",
+     def:"能感受到他人的情緒，常常在對方還沒完整說出來前，就已經接收到那份感受。不是只理解內容，也理解感覺。",
+     why:["對語氣、表情、氛圍變化很敏銳","別人常覺得你真的懂他們的感受","會自然調整自己的回應，以貼近對方狀態"],
+     success:"能建立深層信任，也能在情緒張力高的時候幫團隊維持人性與連結。你提供的是被理解的經驗。",
+     actions:["在重要對話裡先接情緒，再談事情","運用你的同理優勢做關係修復與支持","建立自我照顧機制，避免吸收太多他人情緒","必要時把同理與客觀事實分開處理"],
+     blind:["容易被他人的情緒拖著走","有時會因太在乎感受，而難以做困難決定","若界線不清，會特別容易耗損"],
+     summary:"同理的核心是「感受到他人的內在經驗」。當你同時保有界線與清晰度，這份能力會非常珍貴。"},
+
+    {rank:4, zh:"謹慎", en:"Deliberative", domain:"執行力", accent:"var(--blue)", accentBg:"var(--blue-bg)",
+     def:"做決定前會先停下來評估風險，習慣思考可能的問題、隱藏成本與不確定因素，不會輕易衝動行事。",
+     why:["通常不會太快答應，因為你會先衡量後果","重視安全感與可信任的環境","對細節與潛在風險有很高敏感度"],
+     success:"能幫團隊在行動前看見盲點，避免因過度樂觀或倉促而犯錯。你提供的是穩健，而不是拖延。",
+     actions:["在重大決策中擔任風險評估者","提前規劃備案與風險應對","與尊重你節奏的人合作","把你看到的風險說清楚，也盡量附上建議方案"],
+     blind:["可能被他人解讀為保守、悲觀或慢","若太強調風險，可能錯失機會","有時會因想太完整而遲遲不行動"],
+     summary:"謹慎的核心是「先看風險，再走得穩」。當你把小心與適度行動結合，會是很可靠的判斷者。"},
+
+    {rank:5, zh:"排難", en:"Restorative", domain:"執行力", accent:"var(--blue)", accentBg:"var(--blue-bg)",
+     def:"擅長發現問題並修復它。看到缺口、卡點、故障或混亂時，往往不會逃避，反而會被激發。",
+     why:["能誠實看見問題，不怕面對失誤與不完美","喜歡把壞掉的東西修好，把混亂的狀態拉回可運作","通常會一直想著：怎麼讓它更好"],
+     success:"能在團隊低潮、流程失靈或問題堆積時發揮很大價值。你不是製造問題的人，而是幫人走出問題的人。",
+     actions:["主動投入需要修復與改善的任務","把問題拆解成具體可處理的部分","在看見缺陷時，也記得指出已經做得好的地方","讓自己有休息與抽離的時間，避免一直處在修補模式"],
+     blind:["可能讓人覺得你總在看問題，而不是看優點","容易過早介入別人的課題，剝奪對方自己解決的機會","若太專注修復，可能忽略建立優勢"],
+     summary:"排難的核心是「看見問題、恢復運作」。當你同時能修復問題與看見優勢，影響會更完整。"},
+
+    {rank:6, zh:"完美", en:"Maximizer", domain:"影響力", accent:"var(--purple)", accentBg:"var(--purple-bg)",
+     def:"傾向把已經不錯的東西打磨成卓越，而不是花太多力氣去修補明顯的弱項。聚焦在優勢上，把亮點做大。",
+     why:["很會看見某個人、某個作品或某個系統裡最值得放大的部分","不容易滿足於普通，而是想把好變得更好","喜歡高品質、精緻、成熟的成果"],
+     success:"能幫團隊從合格走向優秀，從可用走向出色。擅長把有限資源放在最能創造價值的地方。",
+     actions:["把時間投入最有優勢的領域","與也想追求卓越的人合作","在指導他人時，幫助對方看見自己的強項","清楚定義什麼是你要追求的高品質"],
+     blind:["可能過於挑剔，讓人感到壓力","太專注優勢時，可能忽略必要的弱點管理","若完美標準過高，會拖慢交付"],
+     summary:"完美的核心是「放大優勢、追求卓越」。當你兼顧品質與實際落地，會產生非常有辨識度的成果。"},
+
+    {rank:7, zh:"責任", en:"Responsibility", domain:"執行力", accent:"var(--blue)", accentBg:"var(--blue-bg)",
+     def:"一旦答應，就會把承諾當成自己的事。對誠信、可靠與完成承諾有很高的內在要求，不容易把承諾看得輕。",
+     why:["不容易把承諾看得輕","即使沒有人盯你，也會自動想把事情做好","別人常把你視為值得信任的人"],
+     success:"能為團隊提供可靠度與信任感。重要的事情交給你，通常會被認真對待並想辦法完成。",
+     actions:["在答應前先檢查自己的容量","用清單或系統追蹤已承諾的事","學習說不，保護真正重要的承諾","在團隊中示範守信文化"],
+     blind:["容易過度承擔，讓自己壓力過大","可能因不放心而難以授權","一旦做不到，常會非常自責"],
+     summary:"責任的核心是「承諾必達、值得信賴」。當你同時擁有界線感，你的可靠會更可持續。"},
+
+    {rank:8, zh:"連結", en:"Connectedness", domain:"思維力", accent:"var(--brown)", accentBg:"var(--brown-bg)",
+     def:"相信人與事之間彼此相連，很多事情不是偶然，而是更大脈絡的一部分。常會自然從整體與意義層次理解世界。",
+     why:["傾向在事件背後尋找更深的連結與原因","相信個體並不是孤立的，而是彼此影響","在不確定時，常能提供一種更大的視角與安定感"],
+     success:"能幫助人們在困難中找到意義，也能提醒團隊：我們不是各做各的，而是在更大的關聯裡一起前進。",
+     actions:["在合作中強調共同目的與彼此影響","幫助他人把眼前事件放回較大的脈絡看","把你的信念轉化成具體支持，而不只是抽象安慰","適合投入重視使命感的工作"],
+     blind:["可能顯得太理想化或太抽象","在他人需要被同理時，若太快講大道理，可能不被接住","若過度相信一切自有安排，可能弱化行動感"],
+     summary:"連結的核心是「在更大脈絡裡找到意義」。當你把意義感與具體行動結合，會帶來很深的安定力量。"},
   ];
 
   const scrollEl = document.getElementById('talentScroll');
@@ -279,8 +425,38 @@
     div.className = 'talent-chip';
     div.style.setProperty('--accent', t.accent);
     div.innerHTML = `<div class="rank">${t.rank}</div><div class="zh">${t.zh}</div><div class="en">${t.en}</div>`;
+    div.addEventListener('click', function(){ openTalentModal(t); });
     scrollEl.appendChild(div);
   });
+
+  function liList(arr){
+    return arr.map(x=>'<li>'+x+'</li>').join('');
+  }
+
+  function openTalentModal(t){
+    var modal = document.getElementById('talentModal');
+    var body = document.getElementById('talentModalBody');
+    body.style.setProperty('--accent', t.accent);
+    body.style.setProperty('--accent-bg', t.accentBg);
+    body.innerHTML =
+      '<div class="tm-rank">'+t.rank+'</div>'+
+      '<div class="tm-title-row"><div class="tm-zh">'+t.zh+'</div><div class="tm-en">'+t.en+'</div></div>'+
+      '<div class="tm-domain">'+t.domain+'</div>'+
+      '<div class="tm-def">'+t.def+'</div>'+
+      '<div class="tm-sec"><h4>為何獨特</h4><ul>'+liList(t.why)+'</ul></div>'+
+      '<div class="tm-sec"><h4>成功原因</h4><p>'+t.success+'</p></div>'+
+      '<div class="tm-sec"><h4>行動建議</h4><ul>'+liList(t.actions)+'</ul></div>'+
+      '<div class="tm-sec"><h4>潛在盲點</h4><ul>'+liList(t.blind)+'</ul></div>'+
+      '<div class="tm-summary"><span class="lbl">核心總結</span>'+t.summary+'</div>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeTalentModal(){
+    document.getElementById('talentModal').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('talentModalBackdrop').addEventListener('click', closeTalentModal);
+  document.getElementById('talentModalClose').addEventListener('click', closeTalentModal);
 
   // ---------- 日期預設為今天 ----------
   const dateInput = document.getElementById('weekDate');
