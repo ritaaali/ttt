@@ -228,13 +228,18 @@
     border-radius: 10px;
     padding: 16px 18px;
     margin-bottom: 14px;
+    cursor: pointer;
   }
+  .history-item:active{ opacity:0.85; }
   .history-item .h-date{
     font-size:13px; font-weight:700; color:var(--brown); margin-bottom:8px;
     display:flex; justify-content:space-between; align-items:center;
   }
   .history-item .h-q{ font-size:13px; font-weight:700; margin-top:10px; color:var(--ink-soft); }
   .history-item .h-a{ font-size:14.5px; line-height:1.7; margin-top:2px; white-space:pre-wrap; }
+  .history-item .h-expand-hint{
+    text-align:right; font-size:12px; color:var(--ink-soft); margin-top:12px; opacity:0.7;
+  }
   .del-btn{
     background:none; border:none; color:var(--ink-soft); font-size:12px;
     text-decoration:underline; padding:4px;
@@ -242,6 +247,31 @@
   .empty-hint{
     text-align:center; color:var(--ink-soft); font-size:13.5px; padding: 30px 0;
   }
+
+  /* ---- 歷史紀錄滿版彈窗 ---- */
+  #historyModalBody{ padding: 10px 26px 10px 26px; }
+  .hm-date{
+    font-family:'NotoSerifTC',serif; font-size:22px; font-weight:700; margin-bottom:22px;
+  }
+  .hm-section-label{
+    display:inline-block; font-size:13px; font-weight:700; letter-spacing:1px;
+    padding:4px 14px; border-radius:20px; margin: 10px 0 18px 0;
+  }
+  .hm-section-label.label-1{ color: var(--blue); background: var(--blue-bg); }
+  .hm-section-label.label-2{ color: var(--purple); background: var(--purple-bg); }
+  .hm-q{ font-size:15px; font-weight:700; margin-bottom:8px; line-height:1.6; }
+  .hm-a{
+    font-size:15.5px; line-height:1.8; white-space:pre-wrap;
+    background:#F3F1EA; border-radius:8px; padding:14px 16px; margin-bottom:22px;
+    color: var(--ink);
+  }
+  .del-btn-full{
+    display:block; width:100%;
+    background: none; border:1px solid #C7756A; color:#B24A3D;
+    border-radius:10px; padding:14px; font-size:14px; font-weight:700;
+    margin-top:16px; font-family:'NotoSansTC',sans-serif;
+  }
+  .del-btn-full:active{ opacity:0.7; }
 
   details.talent-detail summary{
     cursor:pointer; font-size:13px; color:var(--ink-soft); margin: 4px 0 18px 0; text-align:right;
@@ -273,6 +303,10 @@
   }
   #talentModal.show .modal-backdrop{ opacity:1; pointer-events:auto; }
   #talentModal.show .modal-sheet{ transform: translateY(0); }
+  #historyModal .modal-backdrop{ position: fixed; inset:0; background: rgba(20,18,14,0.45); opacity:0; pointer-events:none; transition: opacity .2s ease; z-index:50; }
+  #historyModal.show .modal-backdrop{ opacity:1; pointer-events:auto; }
+  #historyModal.show .modal-sheet{ transform: translateY(0); }
+  .modal-sheet.full{ max-height: 94vh; }
 
   .modal-handle{
     width:44px; height:5px; background:var(--line); border-radius:3px;
@@ -450,6 +484,15 @@
     <div class="modal-handle"></div>
     <button class="modal-close" id="talentModalClose">✕</button>
     <div id="talentModalBody"></div>
+  </div>
+</div>
+
+<div id="historyModal">
+  <div class="modal-backdrop" id="historyModalBackdrop"></div>
+  <div class="modal-sheet full">
+    <div class="modal-handle"></div>
+    <button class="modal-close" id="historyModalClose">✕</button>
+    <div id="historyModalBody"></div>
   </div>
 </div>
 
@@ -721,12 +764,18 @@
         <div class="h-q">(3) 發現</div><div class="h-a">${escapeHtml(en.q3)||'—'}</div>
         <div class="h-q">用了哪項天賦 / 滿足哪些價值觀</div><div class="h-a">${escapeHtml(en.q4)||'—'}</div>
         <div class="h-q">餵養最匱乏的價值觀</div><div class="h-a">${escapeHtml(en.q5)||'—'}</div>
+        <div class="h-expand-hint">點開看滿版 ⤢</div>
       `;
+      item.addEventListener('click', (e)=>{
+        if(e.target.closest('.del-btn')) return;
+        openHistoryModal(en);
+      });
       list.appendChild(item);
     });
 
     document.querySelectorAll('.del-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
         if(!confirm('確定要刪除這筆紀錄嗎？')) return;
         const id = btn.getAttribute('data-id');
         const remaining = loadEntries().filter(e=>e.id !== id);
@@ -735,6 +784,49 @@
       });
     });
   }
+
+  function openHistoryModal(en){
+    const modal = document.getElementById('historyModal');
+    const body = document.getElementById('historyModalBody');
+    body.innerHTML = `
+      <div class="hm-date">📅 ${en.date}</div>
+
+      <div class="hm-section-label label-1">一、天賦覺察練習</div>
+      <div class="hm-q">(1) 我現在是哪一個天賦「過度使用」了？</div>
+      <div class="hm-a">${escapeHtml(en.q1)||'（未填寫）'}</div>
+
+      <div class="hm-q">(2) 我可以做一個「微小」的改變，或用另一個天賦來支援？</div>
+      <div class="hm-a">${escapeHtml(en.q2)||'（未填寫）'}</div>
+
+      <div class="hm-q">(3) 有什麼發現？</div>
+      <div class="hm-a">${escapeHtml(en.q3)||'（未填寫）'}</div>
+
+      <div class="hm-section-label label-2">二、天賦 VS 價值觀練習</div>
+      <div class="hm-q">1. 這週的我用了哪項天賦？滿足了我哪些價值觀？</div>
+      <div class="hm-a">${escapeHtml(en.q4)||'（未填寫）'}</div>
+
+      <div class="hm-q">2. 挑選一個目前「最匱乏」的價值觀，嘗試用你的某些天賦去餵養它？</div>
+      <div class="hm-a">${escapeHtml(en.q5)||'（未填寫）'}</div>
+
+      <button class="del-btn-full" id="historyModalDelete" data-id="${en.id}">🗑 刪除這筆紀錄</button>
+    `;
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    document.getElementById('historyModalDelete').addEventListener('click', ()=>{
+      if(!confirm('確定要刪除這筆紀錄嗎？')) return;
+      const remaining = loadEntries().filter(e=>e.id !== en.id);
+      saveEntries(remaining);
+      closeHistoryModal();
+      renderHistory();
+    });
+  }
+  function closeHistoryModal(){
+    document.getElementById('historyModal').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('historyModalBackdrop').addEventListener('click', closeHistoryModal);
+  document.getElementById('historyModalClose').addEventListener('click', closeHistoryModal);
 
   function escapeHtml(str){
     if(!str) return '';
