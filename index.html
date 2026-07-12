@@ -28,6 +28,7 @@
     --purple:#4A3768;  --purple-bg:#E9E3EF;
     --green: #2E5C46;  --green-bg:#E1EBE3;
     --brown: #6B4A2E;  --brown-bg:#EFE6DA;
+    --gold: #8A6D1D;   --gold-bg:#F1E7CB;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -91,6 +92,43 @@
     margin: 22px 0;
     padding: 22px 20px 26px 20px;
   }
+
+  .report-card{
+    background: var(--card);
+    border:1px solid var(--line);
+    border-radius: 12px;
+    margin: 18px 0;
+    padding: 22px 20px 24px 20px;
+  }
+  .report-card.alt{ background:#F3F1EA; }
+  .report-title{
+    font-family:'NotoSerifTC',serif; font-weight:700; font-size:17px;
+    margin-bottom: 18px; color: var(--ink);
+  }
+
+  .domain-row{
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+  }
+  .domain-row .d-name{ width:64px; font-size:13.5px; font-weight:700; flex-shrink:0; }
+  .domain-row .d-track{
+    flex:1; background:#E7E4DA; border-radius:6px; height:10px; overflow:hidden;
+  }
+  .domain-row .d-fill{ height:100%; border-radius:6px; }
+  .domain-row .d-val{ font-size:12px; color:var(--ink-soft); flex-shrink:0; width:74px; text-align:right; }
+
+  .combo-item{
+    padding: 12px 0; border-bottom: 1px solid var(--line);
+  }
+  .combo-item:last-child{ border-bottom:none; }
+  .combo-item .combo-tag{
+    display:inline-block; font-size:11px; font-weight:700; color:#fff;
+    background: var(--green); padding:2px 10px; border-radius:12px; margin-right:8px;
+  }
+  .combo-item .combo-pair{ font-weight:700; font-size:14.5px; }
+  .combo-item .combo-desc{ font-size:13.5px; line-height:1.7; color:var(--ink-soft); margin-top:6px; }
+
+  .career-text{ font-size:14.5px; line-height:1.8; margin-bottom:14px; }
+  #careerTags .tm-tag{ color: var(--gold); background: var(--gold-bg); }
   .form-card .section-label{
     display:inline-block;
     font-size: 13px; font-weight:700; letter-spacing:1px;
@@ -164,6 +202,24 @@
     display:flex; align-items:center; justify-content:space-between;
   }
   .history-title span.count{ font-size:12px; color:var(--ink-soft); font-weight:400; }
+
+  .export-import-bar{
+    display:flex; gap:12px; margin-bottom: 18px;
+  }
+  .io-btn{
+    flex:1;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'NotoSansTC', sans-serif;
+    color: var(--ink);
+  }
+  .io-btn:active{ opacity:0.7; }
+  .toast.info{ background: var(--blue); }
+  .toast.error{ background: #8B3A3A; }
 
   .history-item{
     background: var(--card);
@@ -272,6 +328,24 @@
     display:block; font-weight:700; color:var(--accent);
     font-family:'NotoSerifTC',serif; font-size:16.5px; margin-bottom:8px;
   }
+
+  .tm-report{
+    margin-top: 28px;
+    padding-top: 26px;
+    border-top: 2px dashed var(--line);
+  }
+  .tm-report-title{
+    font-family:'NotoSerifTC',serif; font-size:16px; font-weight:700;
+    color: var(--ink-soft); margin-bottom:14px; letter-spacing:1px;
+  }
+  .tm-report-desc{
+    font-size:16px; line-height:1.85; margin-bottom:20px; color:var(--ink);
+  }
+  .tm-tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tm-tag{
+    font-size:13px; font-weight:600; color:var(--accent);
+    background: var(--accent-bg); padding:5px 14px; border-radius:16px;
+  }
 </style>
 </head>
 <body>
@@ -287,6 +361,27 @@
   <div class="talents-section">
     <div class="talents-title"><span class="bar" style="background:var(--green)"></span>我的優勢特質 Top 8　<span style="font-size:11px;color:var(--ink-soft);font-weight:400;">（點卡片看詳細內容）</span></div>
     <div class="talent-scroll" id="talentScroll"></div>
+  </div>
+
+  <div class="talents-section">
+    <div class="talents-title"><span class="bar" style="background:var(--gold)"></span>我的價值觀 Top 5</div>
+    <div class="talent-scroll" id="valueScroll"></div>
+  </div>
+
+  <div class="report-card">
+    <div class="report-title">✦ 領域分佈</div>
+    <div id="domainBars"></div>
+  </div>
+
+  <div class="report-card alt">
+    <div class="report-title">✦ 天賦組合詮釋</div>
+    <div id="comboList"></div>
+  </div>
+
+  <div class="report-card">
+    <div class="report-title">✦ 職涯方向建議</div>
+    <p class="career-text" id="careerText"></p>
+    <div class="tm-tags" id="careerTags"></div>
   </div>
 
   <div class="form-card">
@@ -336,6 +431,13 @@
   <div class="history-title">
     歷次紀錄 <span class="count" id="historyCount"></span>
   </div>
+
+  <div class="export-import-bar">
+    <button class="io-btn" id="exportBtn">⬇ 匯出備份</button>
+    <button class="io-btn" id="importBtn">⬆ 匯入備份</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+  </div>
+
   <div id="historyList"></div>
 
 </div>
@@ -354,69 +456,101 @@
 <script>
   // ---------- 8 項優勢資料（供上方速覽卡片使用）----------
   const TALENTS = [
-    {rank:1, zh:"交往", en:"Relator", domain:"關係建立", accent:"var(--green)", accentBg:"var(--green-bg)",
-     def:"喜歡深而真的關係，通常不追求大量表面的互動，而是更在意能否和少數重要的人建立深度連結與真誠合作。",
-     why:["重視信任建立，而不是快速熟絡","和熟悉的人一起工作時，會投入得更深、更久","傾向珍惜長期而真實的友誼"],
-     success:"能建立高信任的合作關係，這種關係一旦建立，通常穩定、深入，而且非常有支持力。",
-     actions:["多安排一對一而非大群體的深度互動","持續經營真正重要的關係，不要因忙碌而斷線","在團隊中示範真誠與忠誠","適度打開圈子，保留接觸新人的可能"],
-     blind:["建立信任較慢，可能讓人覺得難靠近","容易把時間都放在熟人身上，而顯得排外","若圈子太封閉，會錯過新的資源與連結"],
-     summary:"交往的核心是「深度連結、真誠互信」。當你保有深度也保有適度開放，關係資本會更完整。"},
-
-    {rank:2, zh:"伯樂", en:"Developer", domain:"關係建立", accent:"var(--green)", accentBg:"var(--green-bg)",
-     def:"喜歡看見他人成長，尤其擅長注意到細微進步。別人可能還沒看見自己的可能性時，你已經能看見。",
-     why:["會自然對他人的潛力感到興趣","對小進步非常敏感，且真心為此高興","常在關係中扮演鼓勵者、教練或培育者角色"],
-     success:"能讓人感到被看見、被相信，這會明顯提升他們的成長動機。你帶來的不只是支持，而是成長感。",
-     actions:["列出你真正想培育的人，固定投入時間","給需要鼓勵的人更具體的回饋","把焦點放在有成長意願的人身上","不要忘記同時投資自己的發展"],
-     blind:["可能對他人的成長過度投入，甚至替對方扛責任","若對方一直沒有行動，你可能耗損很大","容易把太多注意力放在別人身上，而忽略自己"],
-     summary:"伯樂的核心是「看見潛力、陪伴成長」。當你把鼓勵與界線放在一起，培育效果會更健康。"},
-
-    {rank:3, zh:"同理", en:"Empathy", domain:"關係建立", accent:"var(--green)", accentBg:"var(--green-bg)",
-     def:"能感受到他人的情緒，常常在對方還沒完整說出來前，就已經接收到那份感受。不是只理解內容，也理解感覺。",
-     why:["對語氣、表情、氛圍變化很敏銳","別人常覺得你真的懂他們的感受","會自然調整自己的回應，以貼近對方狀態"],
-     success:"能建立深層信任，也能在情緒張力高的時候幫團隊維持人性與連結。你提供的是被理解的經驗。",
-     actions:["在重要對話裡先接情緒，再談事情","運用你的同理優勢做關係修復與支持","建立自我照顧機制，避免吸收太多他人情緒","必要時把同理與客觀事實分開處理"],
-     blind:["容易被他人的情緒拖著走","有時會因太在乎感受，而難以做困難決定","若界線不清，會特別容易耗損"],
-     summary:"同理的核心是「感受到他人的內在經驗」。當你同時保有界線與清晰度，這份能力會非常珍貴。"},
-
-    {rank:4, zh:"謹慎", en:"Deliberative", domain:"執行力", accent:"var(--blue)", accentBg:"var(--blue-bg)",
+    {rank:1, zh:"謹慎", en:"Deliberative", domain:"執行力", score:20, accent:"var(--blue)", accentBg:"var(--blue-bg)",
      def:"做決定前會先停下來評估風險，習慣思考可能的問題、隱藏成本與不確定因素，不會輕易衝動行事。",
      why:["通常不會太快答應，因為你會先衡量後果","重視安全感與可信任的環境","對細節與潛在風險有很高敏感度"],
      success:"能幫團隊在行動前看見盲點，避免因過度樂觀或倉促而犯錯。你提供的是穩健，而不是拖延。",
      actions:["在重大決策中擔任風險評估者","提前規劃備案與風險應對","與尊重你節奏的人合作","把你看到的風險說清楚，也盡量附上建議方案"],
      blind:["可能被他人解讀為保守、悲觀或慢","若太強調風險，可能錯失機會","有時會因想太完整而遲遲不行動"],
-     summary:"謹慎的核心是「先看風險，再走得穩」。當你把小心與適度行動結合，會是很可靠的判斷者。"},
+     summary:"謹慎的核心是「先看風險，再走得穩」。當你把小心與適度行動結合，會是很可靠的判斷者。",
+     core2:"在決定行動之前，腦子會自動掃描可能出錯的地方。這不是悲觀，是一種預防機制。當別人準備直接行動，你還在確認有沒有漏掉什麼。信息不夠充分時，本能是等待而不是前進。",
+     actions2:["主動承擔風險評估的角色——你的謹慎是團隊的護城河，讓大家少走彎路。","設定一個「夠用的資訊線」——當風險可接受了，練習說出「可以行動了」。","你的小心謹慎讓你很可靠，讓重要的人知道他們可以依賴你把事情想周全。"],
+     blind2:["評估太久有時讓你錯過需要快速抓住的機會，學習辨識什麼時候「夠好就行動」。","你對不確定性的抗拒，有時讓別人感到被拖慢，需要找到節奏上的協調。","不是所有情況都需要最完整的評估——學習根據決策的重要性調整評估的深度。"],
+     directions:["風險管理","財務規劃","法務","品質保證"]},
 
-    {rank:5, zh:"排難", en:"Restorative", domain:"執行力", accent:"var(--blue)", accentBg:"var(--blue-bg)",
-     def:"擅長發現問題並修復它。看到缺口、卡點、故障或混亂時，往往不會逃避，反而會被激發。",
-     why:["能誠實看見問題，不怕面對失誤與不完美","喜歡把壞掉的東西修好，把混亂的狀態拉回可運作","通常會一直想著：怎麼讓它更好"],
-     success:"能在團隊低潮、流程失靈或問題堆積時發揮很大價值。你不是製造問題的人，而是幫人走出問題的人。",
-     actions:["主動投入需要修復與改善的任務","把問題拆解成具體可處理的部分","在看見缺陷時，也記得指出已經做得好的地方","讓自己有休息與抽離的時間，避免一直處在修補模式"],
-     blind:["可能讓人覺得你總在看問題，而不是看優點","容易過早介入別人的課題，剝奪對方自己解決的機會","若太專注修復，可能忽略建立優勢"],
-     summary:"排難的核心是「看見問題、恢復運作」。當你同時能修復問題與看見優勢，影響會更完整。"},
+    {rank:2, zh:"伯樂", en:"Developer", domain:"關係建立", score:20, accent:"var(--green)", accentBg:"var(--green-bg)",
+     def:"喜歡看見他人成長，尤其擅長注意到細微進步。別人可能還沒看見自己的可能性時，你已經能看見。",
+     why:["會自然對他人的潛力感到興趣","對小進步非常敏感，且真心為此高興","常在關係中扮演鼓勵者、教練或培育者角色"],
+     success:"能讓人感到被看見、被相信，這會明顯提升他們的成長動機。你帶來的不只是支持，而是成長感。",
+     actions:["列出你真正想培育的人，固定投入時間","給需要鼓勵的人更具體的回饋","把焦點放在有成長意願的人身上","不要忘記同時投資自己的發展"],
+     blind:["可能對他人的成長過度投入，甚至替對方扛責任","若對方一直沒有行動，你可能耗損很大","容易把太多注意力放在別人身上，而忽略自己"],
+     summary:"伯樂的核心是「看見潛力、陪伴成長」。當你把鼓勵與界線放在一起，培育效果會更健康。",
+     core2:"和人互動時，會自動注意對方還沒被發揮出來的部分。看到有人進步了一點，哪怕很小，會有一種真實的興奮。這個驅動力是針對潛力的，而不是針對結果的——對方願不願意成長，會直接影響你的投入感。",
+     actions2:["列出你想輔導的人，定期和他們見面討論他們的目標——就算只有幾分鐘也好。","把你觀察到的進步說給對方聽，他們需要知道你看見了——你的話可能是他們繼續前進的動力。","幫助掙扎中的人找到更適合他們的位置，而不是只在原地努力——有時最好的伯樂是指引方向。"],
+     blind2:["可能過度在意某人的成長，覺得如果他們遭遇困難是自己的責任——有時最好是讓他們自己走。","投入太多時間在他人身上，有時讓你忘記投資於自己的發展——先照顧好自己才能幫助別人。","在對方還沒準備好的時候就介入太深，反而造成壓力——學習辨識對方什麼時候真的需要你。"],
+     directions:["教師與教練","人才培育","心理諮詢","HR與組織發展"]},
 
-    {rank:6, zh:"完美", en:"Maximizer", domain:"影響力", accent:"var(--purple)", accentBg:"var(--purple-bg)",
-     def:"傾向把已經不錯的東西打磨成卓越，而不是花太多力氣去修補明顯的弱項。聚焦在優勢上，把亮點做大。",
-     why:["很會看見某個人、某個作品或某個系統裡最值得放大的部分","不容易滿足於普通，而是想把好變得更好","喜歡高品質、精緻、成熟的成果"],
-     success:"能幫團隊從合格走向優秀，從可用走向出色。擅長把有限資源放在最能創造價值的地方。",
-     actions:["把時間投入最有優勢的領域","與也想追求卓越的人合作","在指導他人時，幫助對方看見自己的強項","清楚定義什麼是你要追求的高品質"],
-     blind:["可能過於挑剔，讓人感到壓力","太專注優勢時，可能忽略必要的弱點管理","若完美標準過高，會拖慢交付"],
-     summary:"完美的核心是「放大優勢、追求卓越」。當你兼顧品質與實際落地，會產生非常有辨識度的成果。"},
+    {rank:3, zh:"同理", en:"Empathy", domain:"關係建立", score:20, accent:"var(--green)", accentBg:"var(--green-bg)",
+     def:"能感受到他人的情緒，常常在對方還沒完整說出來前，就已經接收到那份感受。不是只理解內容，也理解感覺。",
+     why:["對語氣、表情、氛圍變化很敏銳","別人常覺得你真的懂他們的感受","會自然調整自己的回應，以貼近對方狀態"],
+     success:"能建立深層信任，也能在情緒張力高的時候幫團隊維持人性與連結。你提供的是被理解的經驗。",
+     actions:["在重要對話裡先接情緒，再談事情","運用你的同理優勢做關係修復與支持","建立自我照顧機制，避免吸收太多他人情緒","必要時把同理與客觀事實分開處理"],
+     blind:["容易被他人的情緒拖著走","有時會因太在乎感受，而難以做困難決定","若界線不清，會特別容易耗損"],
+     summary:"同理的核心是「感受到他人的內在經驗」。當你同時保有界線與清晰度，這份能力會非常珍貴。",
+     core2:"在對話裡，你接收到的不只是對方說的話，還有話背後的情緒狀態。這個接收是自動的，不需要刻意去感受。當環境要求你關掉這個頻道、只處理事實，你會感到一種刻意壓抑的消耗。",
+     actions2:["在一次困難對話後，花5分鐘獨處回到自己的感受——讓自己有機會從吸收到的情緒中恢復。","練習說：「我理解你的感受，同時我也需要說……」——讓同理和你自己的聲音都被聽見。","尋找需要深度人際理解的角色，讓你的同理心成為你最大的貢獻，而不是消耗。"],
+     blind2:["容易吸收他人情緒而感到消耗，在高密度的人際互動後需要時間獨處才能恢復。","難以保持客觀距離，有時讓你在需要清晰判斷的情況下被情緒主導。","把同理用來迴避困難的直接對話——有時對方需要的不是被理解，而是清楚的回饋。"],
+     directions:["心理諮詢","社工","醫療照護","需要深度人際連結的工作"]},
 
-    {rank:7, zh:"責任", en:"Responsibility", domain:"執行力", accent:"var(--blue)", accentBg:"var(--blue-bg)",
+    {rank:4, zh:"交往", en:"Relator", domain:"關係建立", score:20, accent:"var(--green)", accentBg:"var(--green-bg)",
+     def:"喜歡深而真的關係，通常不追求大量表面的互動，而是更在意能否和少數重要的人建立深度連結與真誠合作。",
+     why:["重視信任建立，而不是快速熟絡","和熟悉的人一起工作時，會投入得更深、更久","傾向珍惜長期而真實的友誼"],
+     success:"能建立高信任的合作關係，這種關係一旦建立，通常穩定、深入，而且非常有支持力。",
+     actions:["多安排一對一而非大群體的深度互動","持續經營真正重要的關係，不要因忙碌而斷線","在團隊中示範真誠與忠誠","適度打開圈子，保留接觸新人的可能"],
+     blind:["建立信任較慢，可能讓人覺得難靠近","容易把時間都放在熟人身上，而顯得排外","若圈子太封閉，會錯過新的資源與連結"],
+     summary:"交往的核心是「深度連結、真誠互信」。當你保有深度也保有適度開放，關係資本會更完整。",
+     core2:"對關係的投資是選擇性的，但一旦選擇了就是深入的。你在意的不是認識多少人，而是和某些人之間有沒有真實的互相了解。表面的社交往來對你來說能量效益很低，甚至會感到一種空洞。",
+     actions2:["試著一對一和人深交，而不是試圖在群體中建立關係——深度的信任在一對一中最容易發生。","無論多忙，都要和最重要的人保持聯繫——你最親密的關係是你的能量來源。","讓重要的人知道，你對他們的性格比他們的地位更感興趣——你可以成為真實關係的示範。"],
+     blind2:["因為對關係要求深度，建立信任需要較長時間，有些人可能認為你不易熟識或排外。","傾向花更多時間與最熟悉的人在一起，可能錯過擴大社交圈和結識更多人的好處。","人脈圈太窄，在需要拓展連結的情境感到吃力——適度開放讓新的人進來。"],
+     directions:["長期顧問","合夥人關係","研究工作","需要深度信任的長期合作"]},
+
+    {rank:5, zh:"責任", en:"Responsibility", domain:"執行力", score:19, accent:"var(--blue)", accentBg:"var(--blue-bg)",
      def:"一旦答應，就會把承諾當成自己的事。對誠信、可靠與完成承諾有很高的內在要求，不容易把承諾看得輕。",
      why:["不容易把承諾看得輕","即使沒有人盯你，也會自動想把事情做好","別人常把你視為值得信任的人"],
      success:"能為團隊提供可靠度與信任感。重要的事情交給你，通常會被認真對待並想辦法完成。",
      actions:["在答應前先檢查自己的容量","用清單或系統追蹤已承諾的事","學習說不，保護真正重要的承諾","在團隊中示範守信文化"],
      blind:["容易過度承擔，讓自己壓力過大","可能因不放心而難以授權","一旦做不到，常會非常自責"],
-     summary:"責任的核心是「承諾必達、值得信賴」。當你同時擁有界線感，你的可靠會更可持續。"},
+     summary:"責任的核心是「承諾必達、值得信賴」。當你同時擁有界線感，你的可靠會更可持續。",
+     core2:"承諾一旦給出，就在內部建立了一個必須完成的連結。這不是外部壓力，是內在的。別人可能已經忘了，你還記著。做不到時的不安，不來自怕被評價，而是來自自己對自己的標準。",
+     actions2:["在接受新要求前，先檢查你的時間表和待辦清單——讓每一個承諾都是你真的能兌現的。","成為道德監督者：當你看到不道德的行為，採取行動預防和消除它。","你的可靠性是你最珍貴的資產，讓重要的人知道他們可以信賴你。"],
+     blind2:["拒絕對你來說比較困難，有時你會承諾太多——為你的責任設限，先放下一些再接新的。","太多的義務可能妨礙你和生活中重要的人共度時光，記住有時拒絕是最好的答案。","把承擔責任變成一種自我懲罰，會讓你耗盡——學會區分「我想做」和「我應該做」。"],
+     directions:["客戶服務","專案負責人","顧問","需要長期信任的角色"]},
 
-    {rank:8, zh:"連結", en:"Connectedness", domain:"思維力", accent:"var(--brown)", accentBg:"var(--brown-bg)",
+    {rank:6, zh:"排難", en:"Restorative", domain:"執行力", score:19, accent:"var(--blue)", accentBg:"var(--blue-bg)",
+     def:"擅長發現問題並修復它。看到缺口、卡點、故障或混亂時，往往不會逃避，反而會被激發。",
+     why:["能誠實看見問題，不怕面對失誤與不完美","喜歡把壞掉的東西修好，把混亂的狀態拉回可運作","通常會一直想著：怎麼讓它更好"],
+     success:"能在團隊低潮、流程失靈或問題堆積時發揮很大價值。你不是製造問題的人，而是幫人走出問題的人。",
+     actions:["主動投入需要修復與改善的任務","把問題拆解成具體可處理的部分","在看見缺陷時，也記得指出已經做得好的地方","讓自己有休息與抽離的時間，避免一直處在修補模式"],
+     blind:["可能讓人覺得你總在看問題，而不是看優點","容易過早介入別人的課題，剝奪對方自己解決的機會","若太專注修復，可能忽略建立優勢"],
+     summary:"排難的核心是「看見問題、恢復運作」。當你同時能修復問題與看見優勢，影響會更完整。",
+     core2:"看見出問題的東西，本能是找出哪裡壞了、怎麼修。這個衝動在系統、流程、關係上都會觸發。問題被解決之前，會有一種持續的不舒服感；問題被解決之後，才真正放鬆。",
+     actions2:["主動尋找那些別人回避的困難情形——你在這裡最能發揮，而且這讓你充電。","慶祝你解決問題的成功，不要只盯著下一個問題——允許自己感受到完成的滿足。","告訴身邊的人你喜歡解決問題，主動提供幫助——這對你自然，但別人可能不知道。"],
+     blind2:["過於專注在找問題，有時讓人感覺你只看到他們的缺陷，記得也看見他們做得好的地方。","你傾向關注過程而不是人，有時急於解決每個問題——有時人們需要空間自己找解法。","當一個問題根本無解，你會特別洩氣——學習辨識哪些問題值得你的精力，哪些不值。"],
+     directions:["產品管理","流程改善","技術支援","組織顧問"]},
+
+    {rank:7, zh:"完美", en:"Maximizer", domain:"影響力", score:19, accent:"var(--purple)", accentBg:"var(--purple-bg)",
+     def:"傾向把已經不錯的東西打磨成卓越，而不是花太多力氣去修補明顯的弱項。聚焦在優勢上，把亮點做大。",
+     why:["很會看見某個人、某個作品或某個系統裡最值得放大的部分","不容易滿足於普通，而是想把好變得更好","喜歡高品質、精緻、成熟的成果"],
+     success:"能幫團隊從合格走向優秀，從可用走向出色。擅長把有限資源放在最能創造價值的地方。",
+     actions:["把時間投入最有優勢的領域","與也想追求卓越的人合作","在指導他人時，幫助對方看見自己的強項","清楚定義什麼是你要追求的高品質"],
+     blind:["可能過於挑剔，讓人感到壓力","太專注優勢時，可能忽略必要的弱點管理","若完美標準過高，會拖慢交付"],
+     summary:"完美的核心是「放大優勢、追求卓越」。當你兼顧品質與實際落地，會產生非常有辨識度的成果。",
+     core2:"眼光自然落在潛力最高的地方——人、事、想法都是。看到某個東西有從好到頂尖的可能，會產生一種想把它推到極致的衝動。對平均水準不太感興趣，無論是要求自己還是別人。",
+     actions2:["找到一個你欣賞的人，每月給他一個具體的「你可以更好」的觀察——這讓你的天賦有具體的出口。","允許某些事「夠好就好」，刻意練習放手，把精力集中在最值得精雕細琢的地方。","聚焦在最有潛力的事情上，而不是試圖把每件事都推到頂尖——你的時間和精力有限。"],
+     blind2:["標準太高有時讓自己或別人感到喘不過氣，學習在「夠好了」和「還可以更好」之間找到平衡。","對沒有潛力的事快速失去耐心，有時讓你難以處理必要的基本工作。","讓完美主義成為永遠未完成的理由是這個天賦最大的陷阱，注意不要讓「還不夠好」成為不行動的藉口。"],
+     directions:["教練與培訓師","人才發展","精品產業","追求卓越的領域"]},
+
+    {rank:8, zh:"連結", en:"Connectedness", domain:"關係建立", score:19, accent:"var(--green)", accentBg:"var(--green-bg)",
      def:"相信人與事之間彼此相連，很多事情不是偶然，而是更大脈絡的一部分。常會自然從整體與意義層次理解世界。",
      why:["傾向在事件背後尋找更深的連結與原因","相信個體並不是孤立的，而是彼此影響","在不確定時，常能提供一種更大的視角與安定感"],
      success:"能幫助人們在困難中找到意義，也能提醒團隊：我們不是各做各的，而是在更大的關聯裡一起前進。",
      actions:["在合作中強調共同目的與彼此影響","幫助他人把眼前事件放回較大的脈絡看","把你的信念轉化成具體支持，而不只是抽象安慰","適合投入重視使命感的工作"],
      blind:["可能顯得太理想化或太抽象","在他人需要被同理時，若太快講大道理，可能不被接住","若過度相信一切自有安排，可能弱化行動感"],
-     summary:"連結的核心是「在更大脈絡裡找到意義」。當你把意義感與具體行動結合，會帶來很深的安定力量。"},
+     summary:"連結的核心是「在更大脈絡裡找到意義」。當你把意義感與具體行動結合，會帶來很深的安定力量。",
+     core2:"看事情的方式是整體性的——這件事和那件事之間有什麼關聯？這個結果背後的原因是什麼？這不是刻意分析，而是自然看到連結。當工作只有片段、看不到更大的脈絡時，動力會真的下降。",
+     actions2:["幫助身邊的人在日常事件中看到聯繫和更大的意義——你的整體視角是一種珍貴的禮物。","利用你的連結感為穩固的關係打下基礎，從共同點和共同興趣出發。","在計畫開始時，用一句話說清楚它的更大意義——這讓你和團隊都能在細節裡保持方向感。"],
+     blind2:["太過關注意義，有時讓你忽略眼前需要直接處理的現實問題。","有些人可能認為你太天真或理想主義，不是每個人都相信事出必有因。","對他人的壞消息反應可能比他們期待的更冷靜，有時人們需要你先認同他們的感受，而不是哲學分析。"],
+     directions:["哲學與教育","靈性與心理諮詢","組織文化","跨領域整合工作"]},
   ];
 
   const scrollEl = document.getElementById('talentScroll');
@@ -433,6 +567,10 @@
     return arr.map(x=>'<li>'+x+'</li>').join('');
   }
 
+  function tagList(arr){
+    return arr.map(x=>'<span class="tm-tag">'+x+'</span>').join('');
+  }
+
   function openTalentModal(t){
     var modal = document.getElementById('talentModal');
     var body = document.getElementById('talentModalBody');
@@ -441,13 +579,22 @@
     body.innerHTML =
       '<div class="tm-rank">'+t.rank+'</div>'+
       '<div class="tm-title-row"><div class="tm-zh">'+t.zh+'</div><div class="tm-en">'+t.en+'</div></div>'+
-      '<div class="tm-domain">'+t.domain+'</div>'+
+      '<div class="tm-domain">'+t.domain+(t.score?' · '+t.score+' 分':'')+'</div>'+
       '<div class="tm-def">'+t.def+'</div>'+
       '<div class="tm-sec"><h4>為何獨特</h4><ul>'+liList(t.why)+'</ul></div>'+
       '<div class="tm-sec"><h4>成功原因</h4><p>'+t.success+'</p></div>'+
       '<div class="tm-sec"><h4>行動建議</h4><ul>'+liList(t.actions)+'</ul></div>'+
       '<div class="tm-sec"><h4>潛在盲點</h4><ul>'+liList(t.blind)+'</ul></div>'+
-      '<div class="tm-summary"><span class="lbl">核心總結</span>'+t.summary+'</div>';
+      '<div class="tm-summary"><span class="lbl">核心總結</span>'+t.summary+'</div>'+
+      (t.core2 ? (
+        '<div class="tm-report">'+
+          '<div class="tm-report-title">✦ 個人化解讀報告</div>'+
+          '<p class="tm-report-desc">'+t.core2+'</p>'+
+          '<div class="tm-sec"><h4>行動建議</h4><ul>'+liList(t.actions2)+'</ul></div>'+
+          '<div class="tm-sec"><h4>留意盲點</h4><ul>'+liList(t.blind2)+'</ul></div>'+
+          '<div class="tm-sec"><h4>適合方向</h4><div class="tm-tags">'+tagList(t.directions)+'</div></div>'+
+        '</div>'
+      ) : '');
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
@@ -457,6 +604,75 @@
   }
   document.getElementById('talentModalBackdrop').addEventListener('click', closeTalentModal);
   document.getElementById('talentModalClose').addEventListener('click', closeTalentModal);
+
+  // ---------- 我的價值觀 Top 5 ----------
+  const VALUES = [
+    {rank:1, zh:"權力"},
+    {rank:2, zh:"影響力"},
+    {rank:3, zh:"財富"},
+    {rank:4, zh:"健康"},
+    {rank:5, zh:"簡單"},
+  ];
+  const valueScrollEl = document.getElementById('valueScroll');
+  VALUES.forEach(v=>{
+    const div = document.createElement('div');
+    div.className = 'talent-chip';
+    div.style.setProperty('--accent', 'var(--gold)');
+    div.innerHTML = '<div class="rank">'+v.rank+'</div><div class="zh">'+v.zh+'</div>';
+    valueScrollEl.appendChild(div);
+  });
+
+  // ---------- 領域分佈 ----------
+  const DOMAIN_STATS = [
+    {name:"執行力",   score:147, count:9, color:"var(--blue)"},
+    {name:"影響力",   score:120, count:8, color:"var(--purple)"},
+    {name:"關係建立", score:154, count:9, color:"var(--green)"},
+    {name:"思維力",   score:108, count:8, color:"var(--brown)"},
+  ];
+  (function renderDomainBars(){
+    const maxScore = Math.max(...DOMAIN_STATS.map(d=>d.score));
+    const wrap = document.getElementById('domainBars');
+    DOMAIN_STATS.forEach(d=>{
+      const pct = Math.round((d.score / maxScore) * 100);
+      const row = document.createElement('div');
+      row.className = 'domain-row';
+      row.innerHTML =
+        '<div class="d-name">'+d.name+'</div>'+
+        '<div class="d-track"><div class="d-fill" style="width:'+pct+'%; background:'+d.color+';"></div></div>'+
+        '<div class="d-val">'+d.score+'分 / '+d.count+'項</div>';
+      wrap.appendChild(row);
+    });
+  })();
+
+  // ---------- 天賦組合詮釋 ----------
+  const COMBOS = [
+    {pair:"謹慎 × 排難", desc:"你有修復問題的動力，又有提前看見風險的能力——讓你能在問題發生前就開始行動。"},
+    {pair:"伯樂 × 同理", desc:"你能感受他人的情緒，又能看見他們的潛力——讓你的陪伴和引導都更貼近對方真正的需要。"},
+    {pair:"伯樂 × 完美", desc:"你能看見他人的潛力，又有把優勢推向頂尖的眼光——是最強的人才培育組合之一。"},
+    {pair:"同理 × 交往", desc:"你能深度感受對方，又渴望建立長期信任——讓你的深度關係特別有力量。"},
+    {pair:"同理 × 連結", desc:"你能感受萬事萬物的深層關聯，又能感受他人的情緒——讓你對人和世界的理解都特別深刻。"},
+    {pair:"交往 × 責任", desc:"你重視長期信任，又有說到做到的承諾感——讓你成為最可靠的長期夥伴。"},
+  ];
+  (function renderCombos(){
+    const wrap = document.getElementById('comboList');
+    COMBOS.forEach(c=>{
+      const item = document.createElement('div');
+      item.className = 'combo-item';
+      item.innerHTML =
+        '<span class="combo-tag">加乘</span><span class="combo-pair">'+c.pair+'</span>'+
+        '<div class="combo-desc">'+c.desc+'</div>';
+      wrap.appendChild(item);
+    });
+  })();
+
+  // ---------- 職涯方向建議 ----------
+  (function renderCareer(){
+    document.getElementById('careerText').innerHTML =
+      '你的關係建立天賦讓你在任何以人為核心的工作中最能閃耀——諮詢、教育、服務都是你的舞台。<br><br>'+
+      '你的前五名天賦中，<strong>關係建立</strong>類型佔最多（4 個），搭配你獨特的組合，以下方向最值得深耕：';
+    const tags = ["風險管理","財務規劃","法務","品質保證","教師與教練","人才培育"];
+    document.getElementById('careerTags').innerHTML = tagList(tags);
+  })();
 
   // ---------- 日期預設為今天 ----------
   const dateInput = document.getElementById('weekDate');
@@ -476,11 +692,11 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }
 
-  function showToast(msg){
+  function showToast(msg, type){
     const t = document.getElementById('toast');
     t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), 1600);
+    t.className = 'toast show' + (type ? (' ' + type) : '');
+    setTimeout(()=>{ t.classList.remove('show'); }, 2000);
   }
 
   function renderHistory(){
@@ -546,6 +762,87 @@
     ['q1','q2','q3','q4','q5'].forEach(id => document.getElementById(id).value = '');
     showToast('已儲存 ✓');
     renderHistory();
+  });
+
+  // ---------- 匯出備份 ----------
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const entries = loadEntries();
+    if(entries.length === 0){
+      showToast('目前還沒有紀錄可以匯出', 'error');
+      return;
+    }
+    const payload = {
+      app: '天賦導航工作坊回家作業',
+      exportedAt: new Date().toISOString(),
+      talents: TALENTS.map(t=>({rank:t.rank, zh:t.zh, en:t.en})),
+      values: VALUES,
+      entries: entries
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = '天賦作業備份_' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    showToast('已匯出備份檔案 ✓');
+  });
+
+  // ---------- 匯入備份 ----------
+  document.getElementById('importBtn').addEventListener('click', ()=>{
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      let data;
+      try{
+        data = JSON.parse(evt.target.result);
+      }catch(err){
+        showToast('這個檔案格式看起來不對喔', 'error');
+        e.target.value = '';
+        return;
+      }
+      const importedEntries = Array.isArray(data) ? data : (Array.isArray(data.entries) ? data.entries : null);
+      if(!importedEntries){
+        showToast('找不到可匯入的紀錄', 'error');
+        e.target.value = '';
+        return;
+      }
+      const existing = loadEntries();
+      const existingIds = new Set(existing.map(x=>x.id));
+      let added = 0;
+      importedEntries.forEach(imp=>{
+        if(imp && typeof imp === 'object'){
+          const id = imp.id ? String(imp.id) : Date.now().toString() + Math.random().toString(36).slice(2,7);
+          if(!existingIds.has(id)){
+            existing.push({
+              id: id,
+              date: imp.date || '',
+              q1: imp.q1 || '', q2: imp.q2 || '', q3: imp.q3 || '',
+              q4: imp.q4 || '', q5: imp.q5 || ''
+            });
+            existingIds.add(id);
+            added++;
+          }
+        }
+      });
+      saveEntries(existing);
+      renderHistory();
+      showToast('已匯入 ' + added + ' 筆紀錄 ✓');
+      e.target.value = '';
+    };
+    reader.onerror = function(){
+      showToast('讀取檔案失敗', 'error');
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'utf-8');
   });
 
   renderHistory();
