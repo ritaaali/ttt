@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心境變化 · 宜亭</title>
+<style>
+  :root {
+    --bg: #fdf8ee;
+    --bg2: #f5edda;
+    --paper: #fffdf5;
+    --ink: #2a2018;
+    --ink2: #5a4428;
+    --ink3: #9a7a50;
+    --gold: #c9a050;
+    --accent: #8a6d3a;
+    --rose: #b06060;
+    --sage: #508050;
+    --blue: #5068a0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    font-family: 'Hiragino Sans', 'PingFang TC', sans-serif;
+    color: var(--ink);
+    padding: 32px 20px 60px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-family: 'Hiragino Mincho ProN', serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 12px;
+    color: var(--ink3);
+    letter-spacing: 2px;
+    margin-bottom: 32px;
+  }
+
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(138,109,58,0.3), transparent);
+  }
+
+  /* 時間軸 */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--gold), rgba(201,160,80,0.2));
+    border-radius: 2px;
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 18px;
+    background: var(--paper);
+    border: 1px solid rgba(138,109,58,0.12);
+    border-radius: 10px;
+    padding: 13px 15px;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: var(--paper);
+  }
+
+  .tl-date {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--ink3);
+    margin-bottom: 5px;
+  }
+
+  .tl-title {
+    font-family: 'Hiragino Mincho ProN', serif;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 5px;
+    line-height: 1.5;
+  }
+
+  .tl-body {
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.85;
+  }
+
+  .tl-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .tag-wish { background: rgba(176,96,96,0.1); color: var(--rose); }
+  .tag-dong { background: rgba(80,104,160,0.1); color: var(--blue); }
+  .tag-chuang { background: rgba(80,128,80,0.1); color: var(--sage); }
+  .tag-key { background: rgba(201,160,80,0.15); color: var(--accent); }
+
+  /* 演變軌跡 */
+  .track-wrap {
+    background: var(--paper);
+    border: 1px solid rgba(138,109,58,0.12);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+  }
+  .track-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--ink3);
+    margin-bottom: 10px;
+  }
+  .track-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    line-height: 2;
+  }
+  .track-node {
+    font-size: 12px;
+    color: var(--ink2);
+    padding: 3px 10px;
+    background: var(--bg2);
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .track-arrow {
+    color: var(--gold);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .quote {
+    font-size: 12px;
+    color: var(--ink2);
+    line-height: 1.8;
+    border-left: 3px solid var(--gold);
+    padding-left: 12px;
+    margin-top: 8px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">心境變化紀錄</div>
+<div class="page-sub">2026/01 → 07 · 對應心願 Love旅無極印 · 愛的修復師</div>
+
+<!-- 軌跡總覽 -->
+<div class="section">
+  <div class="section-title">三條線的演變軌跡</div>
+
+  <div class="track-wrap">
+    <div class="track-label">心願</div>
+    <div class="track-row">
+      <span class="track-node">樂旅無極印</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">愛旅無極印</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">Love旅無極印 · 愛的修復師</span>
+    </div>
+    <div class="quote">「樂」是條件，「愛」是底層——不管發生什麼都在</div>
+  </div>
+
+  <div class="track-wrap">
+    <div class="track-label">原動力「天真濫情」</div>
+    <div class="track-row">
+      <span class="track-node">被捲走</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">認得出來</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">看著它</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">開始選擇</span>
+    </div>
+    <div class="quote">從「嗶嗶嗶原動力發作😂」到「有些人事物不值得給，要花在刀口上」</div>
+  </div>
+
+  <div class="track-wrap">
+    <div class="track-label">原創力「單純喜樂」</div>
+    <div class="track-row">
+      <span class="track-node">偶發不穩定</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">日常小事出現</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">跟心願連上</span>
+      <span class="track-arrow">→</span>
+      <span class="track-node">落地成生活方式</span>
+    </div>
+    <div class="quote">從「偶爾才有」到「整理房間 this is it，做菜有愛」</div>
+  </div>
+</div>
+
+<!-- 時間軸 -->
+<div class="section">
+  <div class="section-title">月份紀要</div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-date">2026 / 01</div>
+      <div class="tl-title">形而下角色確認：「快樂的負重修復師」</div>
+      <div class="tl-body">
+        心願還是「樂旅無極印」，比較外在——要去玩，要樂。<br>
+        飲食修復方向浮現，開始把自己當第一個學員。<br>
+        被同事侵略碰到創傷崩潰，復原速度比以前快——「我看重的是復原的速度跟撞擊時反應的輕盈度」。
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-wish">樂旅無極印</span>
+        <span class="tag tag-dong">濫情發作中</span>
+        <span class="tag tag-key">快樂的修復師</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">2026 / 02</div>
+      <div class="tl-title">歸根日感受到「像花一樣打開」</div>
+      <div class="tl-body">
+        大掃除兩天，「怎麼可以這麼幸福」——喜樂開始在日常小事裡出現。<br>
+        歸根日薌說「煮這道親密的菜」，那當下有一個東西打開了，像花一樣的感覺。<br>
+        原創力「單純喜樂」確認。
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-chuang">單純喜樂浮現</span>
+        <span class="tag tag-key">大掃除幸福感</span>
+        <span class="tag tag-key">像花打開</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">2026 / 03</div>
+      <div class="tl-title">心願對焦：「怡然自得的修復師」</div>
+      <div class="tl-body">
+        九印裡貼著突然哭了也笑了——「大哭裡面有大笑，笑自己壓抑了這麼多的感覺」。<br>
+        早上自然醒來練功，感覺「不是完成一件事，是閉起眼睛感覺怎麼讓身體舒服」。<br>
+        新生活運動開始，看好笑影片笑到躺在地上——「想起小時候超級愛笑的我」。
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-wish">怡然自得的修復師</span>
+        <span class="tag tag-chuang">本性流露</span>
+        <span class="tag tag-key">新生活運動</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">2026 / 04 — 05 上旬</div>
+      <div class="tl-title">身心震盪期：情緒崩潰 → 找到「愛」</div>
+      <div class="tl-body">
+        連續幾天情緒崩潰，憂鬱症恐慌症跑出來，身體非常不舒服。<br>
+        「允許我看不清楚，就是發瘋啊」——放棄頭腦，那個鎖解開了一些。<br>
+        心願從「樂旅」改成「愛旅」：「愛可以陪我經歷一切，樂不一定，但愛是可以的」。
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-wish">樂→愛</span>
+        <span class="tag tag-key">愛可以陪我經歷一切</span>
+        <span class="tag tag-dong">濫情看著但沒被捲走</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">2026 / 05 — 06</div>
+      <div class="tl-title">歐洲18天：樂旅無極印真實發生</div>
+      <div class="tl-body">
+        「This is it，旅行過程就是Love旅無極印」——在旅途中當下就感受到了。<br>
+        朋友說想跟你去歐洲，感覺到能量不對，停下來等待，讓真實浮出來——對方說「你的回應很真實，讓我學到真實的表達」。<br>
+        「旅行是透過外在來認識內在」——這句話你自己說出來了。<br>
+        照鏡子感覺溫良恭儉讓的味道少了，很高興。
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-wish">Love旅無極印</span>
+        <span class="tag tag-chuang">信手拈來療癒</span>
+        <span class="tag tag-dong">天真濫情有在選擇</span>
+        <span class="tag tag-key">溫良恭儉讓少了</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">2026 / 07</div>
+      <div class="tl-title">落地：愛的修復師在日常裡體現</div>
+      <div class="tl-body">
+        主管說更獨立了，花更少力氣反而做得更好——「我花的力氣是更少的，不演什麼認真苦命人，反而更可以專注在事情上」。<br>
+        整理房間「this is it」——喜樂不需要旅行，日常小事就有。<br>
+        「有些人事物不值得給，有錢要花在刀口上」——天真濫情開始有了選擇。<br>
+        感受到愛自己：「我愛我自己嗎？眼淚流出來，是心貼到心的感覺」。
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-wish">愛的修復師落地</span>
+        <span class="tag tag-chuang">日常就有喜樂</span>
+        <span class="tag tag-dong">開始選擇給誰</span>
+        <span class="tag tag-key">愛自己真實感受到</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 最重要的一句話 -->
+<div style="background: linear-gradient(135deg, #7a5c2a, #c9a050); border-radius:12px; padding:18px 22px; text-align:center; margin-top:8px;">
+  <div style="font-family:'Hiragino Mincho ProN',serif; font-size:14px; color:#fdf8ee; letter-spacing:3px; line-height:1.9;">
+    「我不厲害但是我覺得我棒，我可以覺得我很棒不是嗎？」<br>
+    <span style="font-size:11px; opacity:0.7; letter-spacing:2px;">— 在旅途最低落的時刻，還是站在自己這邊</span>
+  </div>
+</div>
+
+</body>
+</html>
