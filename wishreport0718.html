@@ -474,6 +474,16 @@
 
 
     <div class="table-row">
+      <div class="row-label"><strong>體重負重、情緒負重、疼痛負重<br>的自我修復與療癒<br>以及原廠設定的修復</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">透過修復體重、找多巴胺替代、降低情緒負重</div>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">用愛陪伴：自然還原體重；陪伴與療癒情緒與疼痛，活出最大化的自己</div>
+      </div>
+    </div>    <div class="table-row">
       <div class="row-label"><strong>形而上心願的印證</strong></div>
       <div class="row-cell">
         <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
@@ -484,17 +494,7 @@
     </div>
 
 
-    <div class="table-row">
-      <div class="row-label"><strong>體重負重、情緒負重、疼痛負重<br>的自我修復與療癒<br>以及原廠設定的修復</strong></div>
-      <div class="row-cell">
-        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
-        <div class="note">透過修復體重、找多巴胺替代、降低情緒負重</div>
-      </div>
-      <div class="row-cell">
-        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
-        <div class="note">用愛陪伴：自然還原體重；陪伴與療癒情緒與疼痛，活出最大化的自己</div>
-      </div>
-    </div>
+
   </div>
 </div>
   </div>
@@ -587,13 +587,17 @@
 
     <div class="sub-label">2. 本身的身體健康：把自己當第一個客人（活招牌）</div>
 
-    <div class="table-row">
+    <div class="table-row" style="cursor:pointer;" onclick="toggleSection('d1')">
       <div class="row-label">2-1）體重回歸正常值的能力</div>
-      <div class="row-cell" colspan="2" style="grid-column: span 2;">
+      <div class="row-cell">
         <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
       </div>
+      <div class="row-cell" style="display:flex;align-items:center;gap:8px;">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <span style="font-size:11px;color:var(--ink3);" id="arrow-d1">▼</span>
+      </div>
     </div>
-
+    <div class="collapsible-body closed" id="body-d1">
     <!-- 數值表格 -->
     <div style="padding: 0 18px 16px; overflow-x: auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -653,17 +657,19 @@
         </tbody>
       </table>
     </div>
+    </div><!-- end body-d1 -->
 
-    <div class="table-row">
+    <div class="table-row" style="cursor:pointer;" onclick="toggleSection('d2')">
       <div class="row-label">2-2）有支持平日生活的能力</div>
       <div class="row-cell">
         <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
       </div>
-      <div class="row-cell">
+      <div class="row-cell" style="display:flex;align-items:center;gap:8px;">
         <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <span style="font-size:11px;color:var(--ink3);" id="arrow-d2">▼</span>
       </div>
     </div>
-
+    <div class="collapsible-body closed" id="body-d2">
     <!-- 健康檢查趨勢 -->
     <div style="padding: 0 18px 20px;">
       <div style="font-size:11px; letter-spacing:2px; color:var(--accent); margin-bottom:14px; padding-top:4px;">健康檢查數值趨勢（115/01 → 115/05）</div>
@@ -888,6 +894,7 @@
         ✦ HDL 好膽固醇從偏低恢復達標 · 血糖穩定維持正常範圍 · AST 持續正常並改善
       </div>
     </div>
+    </div><!-- end body-d2 -->
 
     <div class="table-row">
       <div class="row-label">2-3）不會太吃力的做一般的運動<br>基礎的跑步、爬山、瑜伽、肌力</div>
