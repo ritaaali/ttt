@@ -306,6 +306,39 @@
     color: var(--ink3);
     letter-spacing: 2px;
   }
+
+  /* 可收縮區塊 */
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 12px 16px;
+    background: var(--accent);
+    color: #fdf8ee;
+    border-radius: 10px;
+    margin-bottom: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .collapsible-header:active { opacity: 0.85; }
+  .collapsible-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 400;
+  }
+  .collapsible-arrow {
+    font-size: 12px;
+    transition: transform 0.25s;
+    opacity: 0.8;
+  }
+  .collapsible-arrow.open { transform: rotate(180deg); }
+  .collapsible-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .collapsible-body.open { max-height: 9999px; }
+  .collapsible-body.closed { max-height: 0; }
 </style>
 </head>
 <body>
@@ -325,18 +358,8 @@
 <!-- 心願變化 -->
 <div class="wish-card">
   <div class="wish-card-left">
-    <div class="wish-label">現在的心願</div>
-    <div class="wish-main">愛旅無極印</div>
-    <div class="wish-sub">愛的修復師</div>
-  </div>
-  <div class="wish-card-right">
-    <div class="change-label">從五月更新</div>
-    <div class="change-text">
-      樂旅無極印<br>
-      快樂的修復師 → 療癒修復玩家<br>
-      ↓<br>
-      「樂」→「愛」
-    </div>
+    <div class="wish-main">愛旅無極印 · 愛的修復師</div>
+    <div class="wish-sub" style="margin-top:8px; opacity:0.8;">原動力｜天真濫情　　原創力｜單純喜樂</div>
   </div>
 </div>
 
@@ -350,7 +373,11 @@
 
 <!-- 心願轉變 -->
 <div class="section">
-  <div class="section-title">心願的轉變歷程</div>
+  <div class="collapsible-header" style="background:var(--bg2); color:var(--accent);" onclick="toggleSection('s0')">
+    <span class="collapsible-title">心願的轉變歷程</span>
+    <span class="collapsible-arrow" id="arrow-s0" style="color:var(--accent);">▼</span>
+  </div>
+  <div class="collapsible-body closed" id="body-s0">
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
 
     <!-- 形而上 -->
@@ -381,17 +408,27 @@
         <div style="color:var(--gold); font-size:14px; padding-left:14px;">↓</div>
         <div style="font-size:11px; color:var(--ink3); background:var(--bg2); padding:4px 11px; border-radius:20px; display:inline-block; align-self:flex-start;">療癒修復玩家</div>
         <div style="color:var(--gold); font-size:14px; padding-left:14px;">↓</div>
-        <div style="font-size:12px; color:var(--paper); background:var(--accent); padding:5px 12px; border-radius:20px; display:inline-block; align-self:flex-start; font-weight:500;">愛的修復師</div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div style="font-size:12px; color:var(--paper); background:var(--accent); padding:5px 12px; border-radius:20px; font-weight:500;">愛的修復師</div>
+          <div style="font-size:11px; color:var(--accent);">修復的是「愛」</div>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
+  </div>
+</div>
+
 <!-- 核心心願 -->
 <div class="section">
-  <div class="section-title">核心心願項目</div>
-  <div class="table-wrap">
+  <div class="collapsible-header" style="background:var(--bg2); color:var(--accent); border:1px solid rgba(138,109,58,0.2);" onclick="toggleSection('s1')">
+    <span class="collapsible-title">【形而下角色】的核心項目【愛的修復師】</span>
+    <span class="collapsible-arrow" id="arrow-s1" style="color:var(--accent);">▼</span>
+  </div>
+  <div class="collapsible-body closed" id="body-s1">
+    <div class="table-wrap"><div class="table-wrap">
     <div class="table-head">
       <span>項目</span>
       <span>5月進度</span>
@@ -458,11 +495,17 @@
     </div>
   </div>
 </div>
+  </div>
+</div>
 
 <!-- 充實知識 -->
 <div class="section">
-  <div class="section-title">充實知識（1-5年技能）</div>
-  <div class="table-wrap">
+  <div class="collapsible-header" style="background:var(--bg2); color:var(--accent);" onclick="toggleSection('s2')">
+    <span class="collapsible-title">充實知識（1-5年技能）</span>
+    <span class="collapsible-arrow" id="arrow-s2" style="color:var(--accent);">▼</span>
+  </div>
+  <div class="collapsible-body closed" id="body-s2">
+    <div class="table-wrap"><div class="table-wrap">
     <div class="table-head">
       <span>技能項目</span>
       <span>5月進度</span>
@@ -514,11 +557,17 @@
     </div>
   </div>
 </div>
+  </div>
+</div>
 
 <!-- 療癒的能力 -->
 <div class="section">
-  <div class="section-title">療癒的能力</div>
-  <div class="table-wrap">
+  <div class="collapsible-header" style="background:var(--bg2); color:var(--accent); border:1px solid rgba(138,109,58,0.2);" onclick="toggleSection('s3')">
+    <span class="collapsible-title">療癒的能力</span>
+    <span class="collapsible-arrow" id="arrow-s3" style="color:var(--accent);">▼</span>
+  </div>
+  <div class="collapsible-body closed" id="body-s3">
+    <div class="table-wrap"><div class="table-wrap">
     <div class="table-head">
       <span>能力項目</span>
       <span>5月進度</span>
@@ -851,6 +900,24 @@
     </div>
   </div>
 </div>
+  </div>
+</div>
+
+<script>
+function toggleSection(id) {
+  const body = document.getElementById('body-' + id);
+  const arrow = document.getElementById('arrow-' + id);
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    body.classList.add('closed');
+    arrow.classList.remove('open');
+  } else {
+    body.classList.remove('closed');
+    body.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+</script>
 
 <div class="footer">宜亭 · Love旅無極印 · 2026/07/12</div>
 
