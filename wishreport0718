@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心願進度報告 · 宜亭</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #fdf8ee;
+    --bg2: #f5edda;
+    --paper: #fffdf5;
+    --ink: #2a2018;
+    --ink2: #5a4428;
+    --ink3: #9a7a50;
+    --gold: #c9a050;
+    --accent: #8a6d3a;
+    --rose: #b06060;
+    --sage: #508050;
+    --blue: #5068a0;
+    --green: #4a8a4a;
+    --yellow: #c9a050;
+    --gray: #9a9a9a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Noto Sans TC', 'Hiragino Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(138,109,58,0.2);
+  }
+
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--ink3);
+    margin-bottom: 12px;
+  }
+
+  .header-wish {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: 6px;
+    margin-bottom: 8px;
+  }
+
+  .header-role {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .header-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--ink3);
+    letter-spacing: 1px;
+  }
+
+  .header-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .header-meta .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    padding: 14px 18px;
+    background: var(--paper);
+    border-radius: 10px;
+    border: 1px solid rgba(138,109,58,0.12);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink2);
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .s-active { background: #4a8a4a; }
+  .s-slow { background: #c9a050; }
+  .s-pause { background: #9a9a9a; }
+  .s-done { background: #5068a0; }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(138,109,58,0.3), transparent);
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--paper);
+    border-radius: 12px;
+    border: 1px solid rgba(138,109,58,0.12);
+    overflow: hidden;
+  }
+
+  .table-head {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    background: var(--accent);
+    padding: 12px 18px;
+    gap: 12px;
+  }
+
+  .table-head span {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #fdf8ee;
+    font-weight: 400;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 14px 18px;
+    gap: 12px;
+    border-bottom: 1px solid rgba(138,109,58,0.07);
+    align-items: start;
+    transition: background 0.15s;
+  }
+
+  .table-row:last-child {
+    border-bottom: none;
+  }
+
+  .table-row:hover {
+    background: rgba(138,109,58,0.03);
+  }
+
+  .row-label {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.6;
+  }
+
+  .row-label strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .row-cell {
+    font-size: 12px;
+    color: var(--ink2);
+    line-height: 1.65;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 4px;
+  }
+
+  .badge-active { background: rgba(74,138,74,0.12); color: #3a7a3a; }
+  .badge-slow { background: rgba(201,160,80,0.15); color: #8a6020; }
+  .badge-pause { background: rgba(154,154,154,0.12); color: #6a6a6a; }
+  .badge-done { background: rgba(80,104,160,0.12); color: #3a5888; }
+  .badge-new { background: rgba(176,96,96,0.12); color: #8a4848; }
+
+  .change-arrow {
+    display: inline-block;
+    color: var(--green);
+    font-size: 11px;
+    margin-right: 3px;
+  }
+
+  .note {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 3px;
+    line-height: 1.5;
+  }
+
+  /* WISH CARD */
+  .wish-card {
+    background: linear-gradient(135deg, #7a5c2a 0%, #c9a050 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .wish-card-left .wish-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(253,248,238,0.65);
+    margin-bottom: 6px;
+  }
+
+  .wish-card-left .wish-main {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px;
+    color: #fdf8ee;
+    letter-spacing: 4px;
+  }
+
+  .wish-card-left .wish-sub {
+    font-size: 14px;
+    color: rgba(253,248,238,0.8);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  .wish-card-right {
+    text-align: right;
+  }
+
+  .wish-card-right .change-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(253,248,238,0.55);
+    margin-bottom: 4px;
+  }
+
+  .wish-card-right .change-text {
+    font-size: 12px;
+    color: rgba(253,248,238,0.85);
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+
+  /* SUB-SECTION */
+  .sub-label {
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 2px;
+    padding: 10px 18px;
+    background: rgba(138,109,58,0.05);
+    border-bottom: 1px solid rgba(138,109,58,0.07);
+    font-weight: 500;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">心願進度報告 · 2026</div>
+  <div class="header-wish">愛旅無極印</div>
+  <div class="header-role">愛的修復師</div>
+  <div class="header-meta">
+    <span><div class="dot"></div>起始：2026/01</span>
+    <span><div class="dot"></div>中期：2026/05/18</span>
+    <span><div class="dot"></div>現在：2026/07/12</span>
+  </div>
+</div>
+
+<!-- 心願變化 -->
+<div class="wish-card">
+  <div class="wish-card-left">
+    <div class="wish-label">現在的心願</div>
+    <div class="wish-main">愛旅無極印</div>
+    <div class="wish-sub">愛的修復師</div>
+  </div>
+  <div class="wish-card-right">
+    <div class="change-label">從五月更新</div>
+    <div class="change-text">
+      樂旅無極印<br>
+      快樂的修復師 → 療癒修復玩家<br>
+      ↓<br>
+      「樂」→「愛」
+    </div>
+  </div>
+</div>
+
+<!-- 圖例 -->
+<div class="legend">
+  <div class="legend-item"><div class="status-dot s-active"></div>進行中</div>
+  <div class="legend-item"><div class="status-dot s-slow"></div>緩慢進行</div>
+  <div class="legend-item"><div class="status-dot s-pause"></div>暫停／暫無需要</div>
+  <div class="legend-item"><div class="status-dot s-done"></div>有新進展</div>
+</div>
+
+<!-- 核心心願 -->
+<div class="section">
+  <div class="section-title">核心心願項目</div>
+  <div class="table-wrap">
+    <div class="table-head">
+      <span>項目</span>
+      <span>5月進度</span>
+      <span>7月進度</span>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>透過飲食做體重的修復還原</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">↓5.5kg，其中脂肪4.7kg</div>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>吃得開心、健康、營養、充足、好吃、準確、療癒、親密</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">從飲食落實吃得健康、營養、充足、準確、療癒、親密</div>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>分享料理心得與食物</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-slow"><div class="status-dot s-slow"></div>效果普通</span>
+        <div class="note">priority low</div>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-pause"><div class="status-dot s-pause"></div>暫停</span>
+        <div class="note">目前無效果，暫停</div>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>形而上心願的印證</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">歐洲旅行：透過外在旅行認識內在自己</div>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>體重負重、情緒負重、疼痛負重的自我修復與療癒，以及原廠設定的修復</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">透過修復體重、找多巴胺替代、降低情緒負重</div>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+        <div class="note">用愛陪伴：自然還原體重；陪伴與療癒情緒與疼痛，活出最大化的自己</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 充實知識 -->
+<div class="section">
+  <div class="section-title">充實知識（1-5年技能）</div>
+  <div class="table-wrap">
+    <div class="table-head">
+      <span>技能項目</span>
+      <span>5月進度</span>
+      <span>7月進度</span>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>1. 食物營養素與重量量化</strong><br>了解常見食物的營養素及抓準食物的重量</div>
+      <div class="row-cell">
+        <span class="status-badge badge-slow"><div class="status-dot s-slow"></div>可再加強</span>
+        <div class="note">對數字不敏感</div>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-slow"><div class="status-dot s-slow"></div>緩慢進行</span>
+        <div class="note">對數字不敏感，priority low</div>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>2. 做菜技能提升</strong><br>技能、用料、營養、時間、賣相</div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>時間有提升</span>
+        <div class="note">其他七月處理</div>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>調整中</span>
+        <div class="note">不太注重食物的好吃程度，比較是吃營養</div>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>3. 找到適合自己的減重飲食方式</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-pause"><div class="status-dot s-pause"></div>優先權低</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-pause"><div class="status-dot s-pause"></div>暫無需要</span>
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>4. 了解自身體質與健康知識</strong></div>
+      <div class="row-cell">
+        <span class="status-badge badge-pause"><div class="status-dot s-pause"></div>優先權低</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-pause"><div class="status-dot s-pause"></div>暫無需要</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 療癒的能力 -->
+<div class="section">
+  <div class="section-title">療癒的能力</div>
+  <div class="table-wrap">
+    <div class="table-head">
+      <span>能力項目</span>
+      <span>5月進度</span>
+      <span>7月進度</span>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label"><strong>1. 不能用吃，又可以處理情緒、疼痛、壓力的能力</strong><br>保健、靜心、運動等</div>
+      <div class="row-cell">
+        <span class="status-badge badge-new"><div class="status-dot s-done"></div>新增「一虛」</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+    </div>
+
+    <div class="sub-label">2. 本身的身體健康：把自己當第一個客人（活招牌）</div>
+
+    <div class="table-row">
+      <div class="row-label">2-1）體重回歸正常值的能力</div>
+      <div class="row-cell" colspan="2" style="grid-column: span 2;">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+    </div>
+
+    <!-- 數值表格 -->
+    <div style="padding: 0 18px 16px; overflow-x: auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="background:rgba(138,109,58,0.08);">
+            <th style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:500; letter-spacing:1px; border-bottom:1px solid rgba(138,109,58,0.15);">期間</th>
+            <th style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:500; letter-spacing:1px; border-bottom:1px solid rgba(138,109,58,0.15);">體重 (kg)</th>
+            <th style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:500; letter-spacing:1px; border-bottom:1px solid rgba(138,109,58,0.15);">體脂率</th>
+            <th style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:500; letter-spacing:1px; border-bottom:1px solid rgba(138,109,58,0.15);">體脂量</th>
+            <th style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:500; letter-spacing:1px; border-bottom:1px solid rgba(138,109,58,0.15);">肌肉量</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink2); border-bottom:1px solid rgba(138,109,58,0.07);">1/6 → 2/6</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-2.2</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-0.7</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-1.8</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink3); border-bottom:1px solid rgba(138,109,58,0.07);">-0.4</td>
+          </tr>
+          <tr style="background:rgba(138,109,58,0.02);">
+            <td style="padding:7px 12px; text-align:center; color:var(--ink2); border-bottom:1px solid rgba(138,109,58,0.07);">2/6 → 3/9</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-1.1</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-0.7</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-1.1</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink3); border-bottom:1px solid rgba(138,109,58,0.07);">0</td>
+          </tr>
+          <tr>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink2); border-bottom:1px solid rgba(138,109,58,0.07);">3/9 → 4/14</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-2.2</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-0.8</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-1.8</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink3); border-bottom:1px solid rgba(138,109,58,0.07);">-0.4</td>
+          </tr>
+          <tr style="background:rgba(138,109,58,0.02);">
+            <td style="padding:7px 12px; text-align:center; color:var(--ink2); border-bottom:1px solid rgba(138,109,58,0.07);">4/14 → 5/22</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-2.0</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-1.2</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-2.0</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink3); border-bottom:1px solid rgba(138,109,58,0.07);">0</td>
+          </tr>
+
+          <tr>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink2); border-bottom:1px solid rgba(138,109,58,0.07);">5/22 → 7/3</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-1.2</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-0.4</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--rose); border-bottom:1px solid rgba(138,109,58,0.07);">-0.9</td>
+            <td style="padding:7px 12px; text-align:center; color:var(--ink3); border-bottom:1px solid rgba(138,109,58,0.07);">-0.2</td>
+          </tr>
+          <tr style="background:rgba(138,109,58,0.08);">
+            <td style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:500;">總變化<br>1/6 → 7/3</td>
+            <td style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:700;">-8.7</td>
+            <td style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:700;">-3.8</td>
+            <td style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:700;">-7.6</td>
+            <td style="padding:8px 12px; text-align:center; color:var(--accent); font-weight:700;">-1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label">2-2）有支持平日生活的能力</div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>進行中</span>
+      </div>
+    </div>
+
+    <!-- 健康檢查趨勢 -->
+    <div style="padding: 0 18px 20px;">
+      <div style="font-size:11px; letter-spacing:2px; color:var(--accent); margin-bottom:14px; padding-top:4px;">健康檢查數值趨勢（115/01 → 115/05）</div>
+
+      <div style="font-size:11px; color:var(--ink3); margin-bottom:14px; display:flex; gap:16px; flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:20px;height:3px;background:#8a6d3a;border-radius:2px;"></span>1月數值</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:20px;height:3px;background:#c9a050;border-radius:2px;"></span>5月數值</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:20px;height:2px;background:#4a8a4a;border-top:2px dashed #4a8a4a;"></span>正常值上限</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:12px;height:12px;background:rgba(74,138,74,0.15);border-radius:2px;"></span>正常範圍</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:16px;">
+
+        <!-- 肝功能 ALT + AST -->
+        <div style="background:var(--bg2); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:12px; font-weight:500; color:var(--ink2); margin-bottom:10px; letter-spacing:1px;">🔸 肝功能指標（ALT · AST）</div>
+          <svg viewBox="0 0 400 120" style="width:100%; height:auto;">
+            <!-- 正常範圍背景 -->
+            <rect x="40" y="10" width="340" height="70" fill="rgba(74,138,74,0.08)" rx="3"/>
+            <!-- 正常值上限線 -->
+            <line x1="40" y1="80" x2="380" y2="80" stroke="#4a8a4a" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+            <!-- ALT: 1月=53 超標, 5月=22 正常 -->
+            <!-- scale: max=65, range=65, height=80px. y = 80 - (val/65*80) + 10 -->
+            <!-- 1月ALT53: y = 80 - (53/65*80) = 80-65.2=14.8+10=... -->
+            <!-- 簡化: y = 90 - val*1.2 -->
+            <!-- ALT 1月53: y=90-53*1.2=90-63.6=26 -->
+            <!-- ALT 5月22: y=90-22*1.2=90-26.4=63.6 -->
+            <!-- AST 1月27: y=90-27*1.2=90-32.4=57.6 -->
+            <!-- AST 5月14: y=90-14*1.2=90-16.8=73.2 -->
+
+            <!-- X軸位置：ALT在左區，AST在右區 -->
+            <!-- ALT: x1=100, x2=160 -->
+            <!-- AST: x1=240, x2=300 -->
+
+            <!-- ALT bars -->
+            <text x="100" y="108" font-size="9" fill="var(--ink2)" text-anchor="middle">ALT</text>
+            <!-- 1月 ALT=53 超標 紅色 -->
+            <rect x="80" y="26" width="22" height="64" fill="rgba(176,96,96,0.7)" rx="3"/>
+            <text x="91" y="20" font-size="9" fill="var(--rose)" text-anchor="middle">↑超標</text>
+            <!-- 5月 ALT=22 正常 綠色 -->
+            <rect x="112" y="63" width="22" height="27" fill="rgba(74,138,74,0.7)" rx="3"/>
+            <text x="123" y="57" font-size="9" fill="var(--green)" text-anchor="middle">✓正常</text>
+            <!-- 箭頭 -->
+            <path d="M102 40 L112 55" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+
+            <!-- AST bars -->
+            <text x="270" y="108" font-size="9" fill="var(--ink2)" text-anchor="middle">AST</text>
+            <!-- 1月 AST=27 正常 -->
+            <rect x="250" y="57" width="22" height="33" fill="rgba(74,138,74,0.5)" rx="3"/>
+            <text x="261" y="51" font-size="9" fill="var(--green)" text-anchor="middle">✓正常</text>
+            <!-- 5月 AST=14 更好 -->
+            <rect x="282" y="73" width="22" height="17" fill="rgba(74,138,74,0.8)" rx="3"/>
+            <text x="293" y="67" font-size="9" fill="var(--green)" text-anchor="middle">✓更好</text>
+            <path d="M272 65 L282 68" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+
+            <!-- 圖例 -->
+            <rect x="60" y="113" width="10" height="8" fill="rgba(138,109,58,0.6)" rx="1"/>
+            <text x="74" y="120" font-size="8" fill="var(--ink3)">1月</text>
+            <rect x="100" y="113" width="10" height="8" fill="rgba(201,160,80,0.6)" rx="1"/>
+            <text x="114" y="120" font-size="8" fill="var(--ink3)">5月</text>
+
+            <defs>
+              <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent)"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- 血脂 T-CHO + HDL + LDL -->
+        <div style="background:var(--bg2); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:12px; font-weight:500; color:var(--ink2); margin-bottom:10px; letter-spacing:1px;">🔸 血脂指標（總膽固醇 · 好膽固醇↑ · 壞膽固醇↓）</div>
+          <svg viewBox="0 0 400 130" style="width:100%; height:auto;">
+
+            <!-- T-CHO 正常<200 -->
+            <!-- HDL 正常>50（越高越好）-->
+            <!-- LDL 正常<130 -->
+
+            <!-- 三組各佔寬度 -->
+            <!-- T-CHO: x=50-110, HDL: x=160-220, LDL: x=280-340 -->
+
+            <!-- T-CHO scale: 160-240, range=80, height=90 -->
+            <!-- 正常線200: y = 90 - (200-160)/80*90 = 90-45=45+15=60 -->
+            <!-- 1月206: y = 90-(206-160)/80*90 = 90-51.75=38+15=53 -->
+            <!-- 5月180: y = 90-(180-160)/80*90 = 90-22.5=67+15=82 -->
+
+            <!-- T-CHO -->
+            <text x="75" y="12" font-size="10" fill="var(--ink2)" text-anchor="middle" font-weight="500">T-CHO</text>
+            <rect x="45" y="55" width="62" height="50" fill="rgba(74,138,74,0.08)" rx="3"/>
+            <line x1="45" y1="55" x2="107" y2="55" stroke="#4a8a4a" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- 1月 206 超標 -->
+            <rect x="50" y="25" width="22" height="80" fill="rgba(176,96,96,0.65)" rx="3"/>
+            <text x="50" y="22" font-size="8" fill="var(--rose)">超標</text>
+            <!-- 5月 180 正常 -->
+            <rect x="82" y="63" width="22" height="42" fill="rgba(74,138,74,0.7)" rx="3"/>
+            <text x="93" y="57" font-size="8" fill="var(--green)" text-anchor="middle">✓正常</text>
+            <path d="M72 38 L82 53" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+
+            <!-- 分隔線 -->
+            <line x1="135" y1="15" x2="135" y2="110" stroke="rgba(138,109,58,0.15)" stroke-width="1"/>
+
+            <!-- HDL 越高越好 -->
+            <text x="205" y="12" font-size="10" fill="var(--ink2)" text-anchor="middle" font-weight="500">HDL 好膽固醇</text>
+            <text x="205" y="22" font-size="8" fill="var(--ink3)" text-anchor="middle">越高越好</text>
+            <!-- HDL scale 40-60, range=20, height=80 -->
+            <!-- 正常線50: y = 105 - (50-40)/20*80 = 105-40=65 -->
+            <!-- 1月46: y = 105 - (46-40)/20*80 = 105-24=81 -->
+            <!-- 5月52: y = 105 - (52-40)/20*80 = 105-48=57 -->
+            <rect x="175" y="30" width="62" height="35" fill="rgba(74,138,74,0.08)" rx="3"/>
+            <line x1="175" y1="65" x2="237" y2="65" stroke="#4a8a4a" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- 1月 46 偏低 -->
+            <rect x="180" y="73" width="22" height="32" fill="rgba(176,96,96,0.65)" rx="3"/>
+            <text x="191" y="112" font-size="8" fill="var(--rose)" text-anchor="middle">↓偏低</text>
+            <!-- 5月 52 達標 -->
+            <rect x="212" y="49" width="22" height="56" fill="rgba(74,138,74,0.7)" rx="3"/>
+            <text x="223" y="112" font-size="8" fill="var(--green)" text-anchor="middle">✓達標</text>
+            <path d="M202 79 L212 62" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+
+            <!-- 分隔線 -->
+            <line x1="260" y1="15" x2="260" y2="110" stroke="rgba(138,109,58,0.15)" stroke-width="1"/>
+
+            <!-- LDL -->
+            <text x="330" y="12" font-size="10" fill="var(--ink2)" text-anchor="middle" font-weight="500">LDL 壞膽固醇</text>
+            <text x="330" y="22" font-size="8" fill="var(--ink3)" text-anchor="middle">越低越好</text>
+            <rect x="300" y="65" width="62" height="40" fill="rgba(74,138,74,0.08)" rx="3"/>
+            <line x1="300" y1="65" x2="362" y2="65" stroke="#4a8a4a" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- 1月 146 超標 -->
+            <rect x="305" y="30" width="22" height="75" fill="rgba(176,96,96,0.65)" rx="3"/>
+            <text x="305" y="27" font-size="8" fill="var(--rose)">超標</text>
+            <!-- 5月 126 正常 -->
+            <rect x="337" y="68" width="22" height="37" fill="rgba(74,138,74,0.7)" rx="3"/>
+            <text x="337" y="65" font-size="8" fill="var(--green)">✓正常</text>
+            <path d="M327 44 L337 58" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+
+            <!-- 底部圖例 -->
+            <rect x="155" y="118" width="10" height="8" fill="rgba(176,96,96,0.65)" rx="1"/>
+            <text x="169" y="125" font-size="8" fill="var(--ink3)">1月</text>
+            <rect x="195" y="118" width="10" height="8" fill="rgba(74,138,74,0.7)" rx="1"/>
+            <text x="209" y="125" font-size="8" fill="var(--ink3)">5月</text>
+          </svg>
+        </div>
+
+        <!-- TG + 血糖 並排直條圖 -->
+        <div style="background:var(--bg2); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:12px; font-weight:500; color:var(--ink2); margin-bottom:12px; letter-spacing:1px;">🔸 三酸甘油脂（TG）· 空腹血糖（GLU AC）</div>
+          <svg viewBox="0 0 400 145" style="width:100%; height:auto;">
+
+            <!-- TG 左半區 -->
+            <text x="100" y="14" font-size="10" fill="var(--ink2)" text-anchor="middle" font-weight="500">TG 三酸甘油脂</text>
+            <text x="100" y="24" font-size="8" fill="var(--ink3)" text-anchor="middle">越低越好</text>
+
+            <!-- TG 正常範圍 scale 60-160, height=85 -->
+            <!-- 正常線150: y = 115-(150-60)/100*85=38.5 -->
+            <!-- 1月128: y=115-(128-60)/100*85=57.2 -->
+            <!-- 5月98:  y=115-(98-60)/100*85=82.7 -->
+            <rect x="25" y="38" width="152" height="77" fill="rgba(74,138,74,0.08)" rx="3"/>
+            <line x1="25" y1="38" x2="177" y2="38" stroke="#4a8a4a" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <text x="22" y="41" font-size="7" fill="#4a8a4a" text-anchor="end">正常值</text>
+
+            <rect x="55" y="57" width="32" height="58" fill="rgba(138,109,58,0.55)" rx="3"/>
+            <text x="71" y="51" font-size="8" fill="var(--ink2)" text-anchor="middle">✓正常</text>
+
+            <rect x="110" y="83" width="32" height="32" fill="rgba(74,138,74,0.75)" rx="3"/>
+            <text x="126" y="77" font-size="8" fill="var(--green)" text-anchor="middle">✓更好</text>
+
+            <path d="M87 72 C98 76 102 80 110 87" stroke="var(--accent)" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+            <text x="71" y="128" font-size="8" fill="var(--ink3)" text-anchor="middle">1月</text>
+            <text x="126" y="128" font-size="8" fill="var(--ink3)" text-anchor="middle">5月</text>
+            <line x1="25" y1="115" x2="177" y2="115" stroke="rgba(138,109,58,0.15)" stroke-width="1"/>
+
+            <!-- 分隔線 -->
+            <line x1="200" y1="10" x2="200" y2="130" stroke="rgba(138,109,58,0.12)" stroke-width="1"/>
+
+            <!-- 血糖 右半區 -->
+            <text x="300" y="14" font-size="10" fill="var(--ink2)" text-anchor="middle" font-weight="500">GLU 空腹血糖</text>
+            <text x="300" y="24" font-size="8" fill="var(--ink3)" text-anchor="middle">正常範圍內穩定</text>
+
+            <!-- 血糖 scale 70-110, height=85 -->
+            <!-- 上線100: y=115-(100-70)/40*85=51.25 -->
+            <!-- 下線70: y=115 -->
+            <!-- 1月93: y=115-(93-70)/40*85=66.1 -->
+            <!-- 5月89: y=115-(89-70)/40*85=74.6 -->
+            <rect x="220" y="51" width="162" height="64" fill="rgba(74,138,74,0.08)" rx="3"/>
+            <line x1="220" y1="51" x2="382" y2="51" stroke="#4a8a4a" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <text x="217" y="54" font-size="7" fill="#4a8a4a" text-anchor="end">上限</text>
+            <line x1="220" y1="115" x2="382" y2="115" stroke="#4a8a4a" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+            <text x="217" y="118" font-size="7" fill="#4a8a4a" text-anchor="end" opacity="0.6">下限</text>
+
+            <rect x="250" y="66" width="32" height="49" fill="rgba(138,109,58,0.55)" rx="3"/>
+            <text x="266" y="60" font-size="8" fill="var(--green)" text-anchor="middle">✓正常</text>
+
+            <rect x="315" y="74" width="32" height="41" fill="rgba(74,138,74,0.75)" rx="3"/>
+            <text x="331" y="68" font-size="8" fill="var(--green)" text-anchor="middle">✓維持</text>
+
+            <path d="M282 80 C298 82 305 80 315 78" stroke="var(--accent)" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+            <text x="266" y="128" font-size="8" fill="var(--ink3)" text-anchor="middle">1月</text>
+            <text x="331" y="128" font-size="8" fill="var(--ink3)" text-anchor="middle">5月</text>
+            <line x1="220" y1="115" x2="382" y2="115" stroke="rgba(138,109,58,0.15)" stroke-width="1"/>
+
+            <!-- 圖例 -->
+            <rect x="145" y="136" width="10" height="8" fill="rgba(138,109,58,0.55)" rx="1"/>
+            <text x="158" y="143" font-size="8" fill="var(--ink3)">1月</text>
+            <rect x="185" y="136" width="10" height="8" fill="rgba(74,138,74,0.75)" rx="1"/>
+            <text x="198" y="143" font-size="8" fill="var(--ink3)">5月</text>
+
+            <defs>
+              <marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+                <path d="M0,0 L5,2.5 L0,5 Z" fill="var(--accent)"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+      </div>
+
+      <div style="margin-top:14px; font-size:11px; color:var(--ink3); line-height:1.8; padding:12px 14px; background:rgba(74,138,74,0.06); border-radius:8px; border-left:3px solid var(--sage);">
+        ✦ 7項指標全面改善：ALT ↓57% · TG ↓23% · LDL ↓14% · 總膽固醇 ↓13%<br>
+        ✦ HDL 好膽固醇從偏低恢復達標 · 血糖穩定維持正常範圍 · AST 持續正常並改善
+      </div>
+    </div>
+
+    <div class="table-row">
+      <div class="row-label">2-3）不會太吃力的做一般的運動<br>基礎的跑步、爬山、瑜伽、肌力</div>
+      <div class="row-cell">
+        <span class="status-badge badge-pause"><div class="status-dot s-pause"></div>NOT NOW</span>
+      </div>
+      <div class="row-cell">
+        <span class="status-badge badge-active"><div class="status-dot s-active"></div>新增</span>
+        <div class="note">增加 NEAT＋練瑜伽</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">宜亭 · Love旅無極印 · 2026/07/12</div>
+
+</body>
+</html>
+<!-- 這個標記用來找插入點 -->
