@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宜亭生活規劃</title>
+<style>
+  :root {
+    --bg: #fdf8ee;
+    --bg2: #f5edda;
+    --paper: #fffdf5;
+    --ink: #2a2018;
+    --ink2: #5a4428;
+    --ink3: #9a7a50;
+    --gold: #c9a050;
+    --accent: #8a6d3a;
+    --sage: #508050;
+    --rose: #b06060;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Hiragino Sans', 'PingFang TC', sans-serif;
+    color: var(--ink);
+    padding: 20px 16px 60px;
+    max-width: 480px;
+    margin: 0 auto;
+    font-size: 14px;
+  }
+
+  .page-title {
+    font-family: 'Hiragino Mincho ProN', serif;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .page-sub {
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .section {
+    margin-bottom: 20px;
+    background: var(--paper);
+    border: 1px solid rgba(138,109,58,0.15);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: var(--accent);
+    color: #fdf8ee;
+    padding: 10px 16px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+
+  .section-header.light {
+    background: var(--bg2);
+    color: var(--accent);
+    border-bottom: 1px solid rgba(138,109,58,0.15);
+  }
+
+  .arrow { font-size: 10px; transition: transform 0.2s; }
+  .arrow.open { transform: rotate(180deg); }
+
+  .section-body {
+    padding: 14px 16px;
+    display: none;
+  }
+
+  .section-body.open { display: block; }
+
+  /* 時間表 */
+  .time-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(138,109,58,0.07);
+    align-items: start;
+  }
+
+  .time-row:last-child { border-bottom: none; }
+
+  .time {
+    font-size: 11px;
+    color: var(--ink3);
+    font-variant-numeric: tabular-nums;
+    padding-top: 1px;
+  }
+
+  .task {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+
+  .task.highlight {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .badge-thu {
+    background: rgba(80,128,80,0.12);
+    color: var(--sage);
+  }
+
+  /* 清單 */
+  .list-item {
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(138,109,58,0.07);
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.6;
+    display: flex;
+    gap: 8px;
+  }
+
+  .list-item:last-child { border-bottom: none; }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .dot.sage { background: var(--sage); }
+  .dot.rose { background: var(--rose); }
+
+  .sub-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--ink3);
+    margin: 10px 0 6px;
+  }
+
+  /* 週別 */
+  .week-grid {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 6px;
+    align-items: start;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(138,109,58,0.07);
+    font-size: 12px;
+  }
+
+  .week-grid:last-child { border-bottom: none; }
+
+  .week-label {
+    color: var(--ink3);
+    font-size: 11px;
+  }
+
+  .week-content { color: var(--ink2); line-height: 1.6; }
+
+  /* 菜色 */
+  .food-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .food-card {
+    background: var(--bg2);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .food-card-label {
+    font-size: 10px;
+    color: var(--ink3);
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+
+  .food-card-items {
+    font-size: 12px;
+    color: var(--ink2);
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">宜亭生活規劃</div>
+<div class="page-sub">愛旅無極印 · 愛的修復師</div>
+
+<!-- 平日作息 -->
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    平日作息
+    <span class="arrow">▼</span>
+  </div>
+  <div class="section-body open">
+
+    <div class="time-row">
+      <div class="time">08:00</div>
+      <div class="task">起床、洗臉化妝搭衣服</div>
+    </div>
+    <div class="time-row">
+      <div class="time">08:30</div>
+      <div class="task">出門</div>
+    </div>
+    <div class="time-row">
+      <div class="time">09:00–18:00</div>
+      <div class="task">工作（早餐在公司吃）</div>
+    </div>
+    <div class="time-row">
+      <div class="time">17:30–18:00</div>
+      <div class="task highlight">在公司吃晚餐</div>
+    </div>
+    <div class="time-row">
+      <div class="time">18:30</div>
+      <div class="task">到家、換衣服放鬆</div>
+    </div>
+    <div class="time-row">
+      <div class="time">19:00–20:30</div>
+      <div class="task highlight">練功
+        <span class="badge badge-thu">週四改20:00–21:20瑜珈課</span>
+      </div>
+    </div>
+    <div class="time-row">
+      <div class="time">20:30–21:00</div>
+      <div class="task">洗澡</div>
+    </div>
+    <div class="time-row">
+      <div class="time">21:00–22:30</div>
+      <div class="task">備餐／娛樂／紀錄</div>
+    </div>
+    <div class="time-row">
+      <div class="time">23:00</div>
+      <div class="task highlight">睡覺</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 備餐規劃 -->
+<div class="section">
+  <div class="section-header light" onclick="toggle(this)">
+    備餐規劃
+    <span class="arrow open" style="color:var(--accent);">▼</span>
+  </div>
+  <div class="section-body open">
+
+    <div class="sub-label">採買方式</div>
+    <div class="list-item"><div class="dot"></div><div>週日外送：新鮮魚／豬肉、高麗菜、花椰菜、彩椒、豆乾</div></div>
+    <div class="list-item"><div class="dot"></div><div>週三之後用冷凍肉品，蔬菜中午去附近買葉菜類</div></div>
+    <div class="list-item"><div class="dot sage"></div><div>冷凍庫常備：即食雞胸、海鮮、毛豆、鷹嘴豆咖哩</div></div>
+    <div class="list-item"><div class="dot sage"></div><div>五穀飯一次煮多，冷凍備用，退冰即食</div></div>
+
+    <div class="sub-label" style="margin-top:14px;">備餐時間</div>
+    <div class="week-grid">
+      <div class="week-label">週日晚上</div>
+      <div class="week-content">備週一、週二的量</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">週二晚上</div>
+      <div class="week-content">⚠️ 把冷凍肉取出退冰（週三用）</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">週三</div>
+      <div class="week-content">即食雞胸＋微波蔬菜＋退冰飯（免備餐）</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">週三晚上</div>
+      <div class="week-content">備週四、週五的量</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">週五</div>
+      <div class="week-content">冷凍肉品＋微波蔬菜＋退冰飯（簡單吃）</div>
+    </div>
+
+    <div class="sub-label" style="margin-top:14px;">固定菜色</div>
+    <div class="food-grid">
+      <div class="food-card">
+        <div class="food-card-label">主食</div>
+        <div class="food-card-items">五穀飯<br>（偶爾義大利麵）</div>
+      </div>
+      <div class="food-card">
+        <div class="food-card-label">蛋白質（輪流）</div>
+        <div class="food-card-items">魚、豬肉<br>即食雞胸、海鮮<br>鷹嘴豆（含碳水，吃了飯少一點）</div>
+      </div>
+      <div class="food-card">
+        <div class="food-card-label">蔬菜快速（微波）</div>
+        <div class="food-card-items">高麗菜<br>花椰菜<br>豆芽菜</div>
+      </div>
+      <div class="food-card">
+        <div class="food-card-label">蔬菜有時間</div>
+        <div class="food-card-items">空心菜（燙）<br>莧菜（燙）<br>根莖類</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 週末行程 -->
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    每月固定行程
+    <span class="arrow">▼</span>
+  </div>
+  <div class="section-body">
+
+    <div class="week-grid">
+      <div class="week-label">第一週六</div>
+      <div class="week-content">早上：歸根日</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">第一週日</div>
+      <div class="week-content">早上8–9點：飲食會議</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">第三週六</div>
+      <div class="week-content">台中上課</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-label">第四週日</div>
+      <div class="week-content">台中上課，隔天陪家人</div>
+    </div>
+
+    <div class="sub-label" style="margin-top:12px;">空閒時</div>
+    <div class="list-item"><div class="dot sage"></div><div>出去散步或騎腳踏車，不強迫，有空就去</div></div>
+
+  </div>
+</div>
+
+<!-- 紀錄 -->
+<div class="section">
+  <div class="section-header light" onclick="toggle(this)">
+    每日紀錄
+    <span class="arrow" style="color:var(--accent);">▼</span>
+  </div>
+  <div class="section-body">
+
+    <div class="list-item"><div class="dot"></div><div>即時想到就傳給Claude——心得、在幹嘛、感受都可以</div></div>
+    <div class="list-item"><div class="dot sage"></div><div>⚠️ 週末記得找Claude說「幫我回顧這週」</div></div>
+
+  </div>
+</div>
+
+<script>
+function toggle(header) {
+  const arrow = header.querySelector('.arrow');
+  const body = header.nextElementSibling;
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  } else {
+    body.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+</script>
+
+</body>
+</html>
