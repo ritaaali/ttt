@@ -181,10 +181,11 @@ h2 small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:4
       <option value="0">依卡片建議</option><option value="1">1 分鐘</option><option value="2">2 分鐘</option>
       <option value="3">3 分鐘</option><option value="5">5 分鐘</option></select></label>
     <label>結束前提醒 <select id="warnSel"><option value="0">不提醒</option><option value="3">3 秒</option><option value="5">5 秒</option><option value="10">10 秒</option><option value="15">15 秒</option></select></label>
-    <label>提醒方式 <select id="modeSel"><option value="each">每秒倒數</option><option value="once">只響一次</option></select></label>
+    <label>提醒聲 <select id="rtypeSel"><option value="bell">鈴聲</option><option value="voice">人聲</option><option value="both">鈴聲＋人聲</option></select></label>
+    <label>提醒方式 <select id="modeSel"><option value="each">每秒倒數</option><option value="once">只提醒一次</option></select></label>
     <label>提醒音色 <select id="toneSel"><option value="soft">溫柔鐘聲</option><option value="kalimba">拇指琴</option><option value="drop">水滴</option><option value="wind">風鈴</option><option value="ding">清脆叮叮</option></select></label>
     <button class="ghost" id="testVoice">試聽語音</button>
-    <button class="ghost" id="testBell">試聽鈴聲</button>
+    <button class="ghost" id="testBell">試聽提醒</button>
     <button class="ghost" id="diagBtn">聲音檢查</button>
     <pre id="diag" hidden style="flex-basis:100%;white-space:pre-wrap;font-size:12.5px;background:var(--bg);border-radius:8px;padding:10px;margin:0;overflow-x:auto"></pre>
   </div>
@@ -433,7 +434,7 @@ const FIG={
 const LEN={T:24,N:7,R:5.2,TH:19,SH:19,UA:14,FA:13};
 const dirv=a=>{const r=a*Math.PI/180;return [Math.cos(r),-Math.sin(r)]};
 function ik(B,E,l1,l2,bend){
-  const dx=E[0]-B[0],dy=E[1]-B[1];let d=Math.hypot(dx,dy);const ux=dx/d,uy=dy/d;
+  const dx=E[0]-B[0],dy=E[1]-B[1];let d=Math.hypot(dx,dy);const ux=d>0.01?dx/d:0,uy=d>0.01?dy/d:1;
   if(d>=l1+l2-0.01){const J=[B[0]+ux*l1,B[1]+uy*l1];return [J,[B[0]+ux*(l1+l2),B[1]+uy*(l1+l2)]]}
   d=Math.max(d,Math.abs(l1-l2)+0.5);
   const a=(l1*l1-l2*l2+d*d)/(2*d),h=Math.sqrt(Math.max(0,l1*l1-a*a));
@@ -485,14 +486,14 @@ seqs.forEach(q=>{q.items=(q.items||[]).filter(it=>byId[it.id])});
 let curId=store.get("yin.cur",seqs[0].id);if(!seqs.find(q=>q.id===curId))curId=seqs[0].id;
 const cur=()=>seqs.find(q=>q.id===curId);
 const inCur=id=>cur().items.some(it=>it.id===id);
-const MINS=[0.5,1,1.5,2,2.5,3,4,5,6,7,8,10,12,15,20];
+const MINS=[0.25,0.5,0.75,1,1.5,2,2.5,3,4,5,6,7,8,10,12,15,20];
 let lang=store.get("yin.lang","zh");if(lang!=="en")lang="zh";
 const T={
- zh:{sides:"記得兩邊都做。",first:"先做第一邊。",sw:"換另一邊。",holdS:n=>`現在開始停留${n}秒，自然呼吸。`,holdM:n=>`現在開始停留${n}分鐘，放鬆，自然呼吸。`,
+ zh:{left:n=>`還有${n}秒。`,sides:"記得兩邊都做。",first:"先做第一邊。",sw:"換另一邊。",holdS:n=>`現在開始停留${n}秒，自然呼吸。`,holdM:n=>`現在開始停留${n}分鐘，放鬆，自然呼吸。`,
    mid:"留意身體哪裡還在用力，讓它軟下來。",end:"準備慢慢離開這個姿勢。",rest:"慢慢離開，休息一下。",done:"練習完成。慢慢回到坐姿，記得多喝水。",test:"吸氣，延長脊椎。吐氣，放鬆肩膀。",pt:"吸氣，延長脊椎。",
    s1:"・第一邊",s2:"・第二邊",next:"下一個：",nextSw:"（換邊）",last:"這是最後一式",water:"記得多喝水。",doneT:"練習完成",remain:"剩餘",holdFor:"停留 ",sec:"秒",all:"全部剩",
    ph:{enter:"進入姿勢",hold:"停留・自然呼吸",sw:"換邊",rest:"慢慢離開，稍作休息",done:"練習完成",paused:"已暫停"},caution:"注意",readBtn:"▶ 朗讀",readSteps:"▶ 朗讀步驟",bothSides:"左右各一次"},
- en:{sides:"Remember to do both sides.",first:"Start with the first side.",sw:"Switch to the other side.",holdS:n=>`Now hold for ${n} seconds. Breathe naturally.`,holdM:n=>`Now hold for ${n} minute${n==1?"":"s"}. Relax and breathe naturally.`,
+ en:{left:n=>`${n} seconds left.`,sides:"Remember to do both sides.",first:"Start with the first side.",sw:"Switch to the other side.",holdS:n=>`Now hold for ${n} seconds. Breathe naturally.`,holdM:n=>`Now hold for ${n} minute${n==1?"":"s"}. Relax and breathe naturally.`,
    mid:"Notice where you are still holding on, and let it soften.",end:"Get ready to slowly come out of the pose.",rest:"Slowly come out, and rest for a moment.",done:"Practice complete. Slowly come back to sitting, and remember to drink some water.",test:"Inhale, lengthen your spine. Exhale, relax your shoulders.",pt:"Inhale, lengthen your spine.",
    s1:" · Side 1",s2:" · Side 2",next:"Next: ",nextSw:" (switch sides)",last:"This is the last pose",water:"Remember to drink some water.",doneT:"Practice complete",remain:"left",holdFor:"hold ",sec:"sec",all:"Total left ",
    ph:{enter:"GET INTO THE POSE",hold:"HOLD · BREATHE",sw:"SWITCH SIDES",rest:"COME OUT SLOWLY",done:"COMPLETE",paused:"PAUSED"},caution:"Caution",readBtn:"▶ Listen",readSteps:"▶ Read steps",bothSides:"Both sides"}
@@ -545,11 +546,25 @@ $("#diagBtn").onclick=()=>{
     setTimeout(()=>log("3 秒後：speaking="+speechSynthesis.speaking+" pending="+speechSynthesis.pending),3000);
   }
 };
-let warnMode=store.get("yin.mode","each"),toneStyle=store.get("yin.tone","soft");
+let warnMode=store.get("yin.mode","each"),toneStyle=store.get("yin.tone","soft"),rtype=store.get("yin.rtype","bell");
+$("#rtypeSel").value=rtype;$("#rtypeSel").onchange=e=>{rtype=e.target.value;store.set("yin.rtype",rtype)};
+const useBell=()=>rtype!=="voice",useVoice=()=>rtype!=="bell";
+/* 結束前提醒：first = 這一輪第一次提醒 */
+function remind(sec,first){
+  if(useBell())tick(sec);
+  if(useVoice()){
+    if(warnMode==="each"){stopSpeech();speak(String(sec))}
+    else{stopSpeech();speak(L().left(sec))}
+  }
+}
+function endSound(){if(useBell())bowl()}
 $("#modeSel").value=warnMode;$("#toneSel").value=toneStyle;
 $("#modeSel").onchange=e=>{warnMode=e.target.value;store.set("yin.mode",warnMode)};
-$("#toneSel").onchange=e=>{toneStyle=e.target.value;store.set("yin.tone",toneStyle);tick(3)};
-$("#testBell").onclick=()=>{if(warnMode==="each"){[3,2,1].forEach((n,i)=>setTimeout(()=>tick(n),i*1000));setTimeout(bowl,3000)}else{tick(3);setTimeout(bowl,1800)}};
+$("#toneSel").onchange=e=>{toneStyle=e.target.value;store.set("yin.tone",toneStyle);prepareSounds();setTimeout(()=>tick(3),250)};
+$("#testBell").onclick=()=>{
+  const step=useVoice()?1600:1000;
+  if(warnMode==="each"){[3,2,1].forEach((n,i)=>setTimeout(()=>remind(n,i===0),i*step));setTimeout(endSound,3*step)}
+  else{remind(3,true);setTimeout(endSound,2200)}};
 $("#setBtn").onclick=e=>{const s=$("#settings");s.hidden=!s.hidden;e.target.setAttribute("aria-expanded",!s.hidden)};
 $("#testVoice").onclick=()=>{stopSpeech();speak(L().test)};
 
@@ -575,44 +590,76 @@ async function speak(text){
 let justCancelled=0;
 function stopSpeech(){speechGen++;if(synth&&(synth.speaking||synth.pending)){synth.cancel();justCancelled=Date.now()}}
 
-/* 鈴聲：結束前「叮叮」＋結束時頌缽 */
+/* 鈴聲：先把每個聲音算成音檔，再用 <audio> 播放（iPhone 上比直接合成穩定，也不會被語音蓋掉） */
 let actx=null,master=null;
+function buildGraph(ctx){
+  const m=ctx.createGain();m.gain.value=0.9;m.connect(ctx.destination);
+  try{const r=ctx.sampleRate,len=Math.floor(r*2.8),b=ctx.createBuffer(2,len,r);
+    for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.2)}
+    const conv=ctx.createConvolver();conv.buffer=b;const wet=ctx.createGain();wet.gain.value=0.32;
+    m.connect(conv);conv.connect(wet);wet.connect(ctx.destination)}catch(e){}
+  return m;
+}
 function ac(){
-  if(!actx){
-    actx=new (window.AudioContext||window.webkitAudioContext)();
-    master=actx.createGain();master.gain.value=0.9;master.connect(actx.destination);
-    try{const r=actx.sampleRate,len=Math.floor(r*2.8),b=actx.createBuffer(2,len,r);
-      for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.2)}
-      const conv=actx.createConvolver();conv.buffer=b;const wet=actx.createGain();wet.gain.value=0.32;
-      master.connect(conv);conv.connect(wet);wet.connect(actx.destination)}catch(e){}
-  }
+  if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();master=buildGraph(actx)}
   if(actx.state!=="running"&&actx.resume)actx.resume();
   return actx;
 }
-function strike(f,t,vol,dur,partials,atk=0.005,glide=0){
+function strikeOn(ctx,dest,f,t,vol,dur,partials,atk=0.005,glide=0){
   partials.forEach(([ratio,amp,decay])=>{
-    const o=actx.createOscillator(),g=actx.createGain(),end=t+dur*decay;
+    const o=ctx.createOscillator(),g=ctx.createGain(),end=t+dur*decay;
     o.type="sine";if(glide){o.frequency.setValueAtTime(f*ratio*glide,t);o.frequency.exponentialRampToValueAtTime(f*ratio,t+0.06)}else o.frequency.value=f*ratio;
     g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol*amp,t+atk);g.gain.exponentialRampToValueAtTime(0.0001,end);
-    o.connect(g);g.connect(master);o.start(t);o.stop(end+0.05);
+    o.connect(g);g.connect(dest);o.start(t);o.stop(end+0.05);
   });
 }
 const DING=[[1,1,1],[2,0.22,0.5],[3,0.1,0.32],[4.16,0.05,0.2]];
 const BOWL=[[1,1,1],[2.71,0.42,0.62],[5.15,0.16,0.36],[8.4,0.05,0.2]];
-function ding(){try{const a=ac(),t=a.currentTime+0.03;strike(1046.5,t,0.2,1.8,DING);strike(1318.5,t+0.26,0.2,2.4,DING)}catch(e){}}
-function bowl(){try{const a=ac(),t=a.currentTime+0.03;strike(392,t,0.17,7,BOWL,0.035);strike(393.4,t,0.11,7,BOWL,0.035)}catch(e){}}
-/* 倒數音：n = 剩幾秒，音高隨倒數慢慢往下走 */
 const PENTA=[523.25,587.33,659.25,783.99,880,1046.5];
-function tick(n){
-  try{const a=ac(),t=a.currentTime+0.03,k=Math.max(0,Math.min(PENTA.length-1,n-1)),f=PENTA[k];
-    if(toneStyle==="soft")strike(f,t,0.15,2.2,[[1,1,1],[2,0.09,0.45],[3,0.03,0.25]],0.025);
-    else if(toneStyle==="kalimba")strike(f,t,0.2,1.4,[[1,1,1],[3,0.1,0.25],[5.4,0.035,0.12]],0.004);
-    else if(toneStyle==="drop")strike(f*1.5,t,0.14,0.7,[[1,1,1],[2,0.05,0.4]],0.008,0.82);
-    else if(toneStyle==="wind"){strike(f*2,t,0.07,2.8,[[1,1,1],[2.76,0.14,0.4]],0.006);strike(f*2*1.5,t+0.09,0.045,2.4,[[1,1,1]],0.006)}
-    else ding();
-  }catch(e){}
+function drawDing(c,d,t){strikeOn(c,d,1046.5,t,0.2,1.8,DING);strikeOn(c,d,1318.5,t+0.26,0.2,2.4,DING)}
+function drawBowl(c,d,t){strikeOn(c,d,392,t,0.17,7,BOWL,0.035);strikeOn(c,d,393.4,t,0.11,7,BOWL,0.035)}
+function drawTick(c,d,t,style,n){
+  const f=PENTA[Math.max(0,Math.min(PENTA.length-1,n-1))];
+  if(style==="soft")strikeOn(c,d,f,t,0.15,2.2,[[1,1,1],[2,0.09,0.45],[3,0.03,0.25]],0.025);
+  else if(style==="kalimba")strikeOn(c,d,f,t,0.2,1.4,[[1,1,1],[3,0.1,0.25],[5.4,0.035,0.12]],0.004);
+  else if(style==="drop")strikeOn(c,d,f*1.5,t,0.14,0.7,[[1,1,1],[2,0.05,0.4]],0.008,0.82);
+  else if(style==="wind"){strikeOn(c,d,f*2,t,0.07,2.8,[[1,1,1],[2.76,0.14,0.4]],0.006);strikeOn(c,d,f*3,t+0.09,0.045,2.4,[[1,1,1]],0.006)}
+  else drawDing(c,d,t);
 }
+function wavURL(data,sr){
+  const n=data.length,buf=new ArrayBuffer(44+n*2),v=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,"RIFF");v.setUint32(4,36+n*2,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){const x=Math.max(-1,Math.min(1,data[i]));v.setInt16(44+i*2,x<0?x*0x8000:x*0x7fff,true)}
+  return URL.createObjectURL(new Blob([buf],{type:"audio/wav"}));
+}
+const SILENT=wavURL(new Float32Array(2205),22050);
+const sndCache={},sndWait={};
+function renderSnd(key,dur,draw){
+  if(sndCache[key]||sndWait[key])return;
+  const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!OAC)return;
+  try{const sr=44100,ctx=new OAC(2,Math.ceil(sr*dur),sr);draw(ctx,buildGraph(ctx),0.02);
+    sndWait[key]=1;
+    const done=b=>{const L=b.getChannelData(0),R=b.numberOfChannels>1?b.getChannelData(1):L,m=new Float32Array(L.length);for(let i=0;i<L.length;i++)m[i]=(L[i]+R[i])*0.5;sndCache[key]=wavURL(m,sr);delete sndWait[key]};
+    const pr=ctx.startRendering();if(pr&&pr.then)pr.then(done).catch(()=>delete sndWait[key]);else ctx.oncomplete=e=>done(e.renderedBuffer);
+  }catch(e){delete sndWait[key]}
+}
+function prepareSounds(){
+  renderSnd("bowl",8,drawBowl);
+  for(let n=1;n<=6;n++)renderSnd(`t:${toneStyle}:${n}`,toneStyle==="ding"?3:3.2,(c,d,t)=>drawTick(c,d,t,toneStyle,n));
+}
+const sndEls=[0,1,2].map(()=>{const a=new Audio();a.preload="auto";a.setAttribute("playsinline","");return a});let sndI=0;
+function playSnd(key,live){
+  const u=sndCache[key];
+  if(!u){try{const a=ac();live(a,master,a.currentTime+0.03)}catch(e){}return}
+  const el=sndEls[sndI++%sndEls.length];
+  try{el.pause();el.src=u;el.volume=1;const p=el.play();if(p&&p.catch)p.catch(()=>{try{const a=ac();live(a,master,a.currentTime+0.03)}catch(e){}})}catch(e){}
+}
+function tick(n){const k=Math.max(1,Math.min(6,n));playSnd(`t:${toneStyle}:${k}`,(c,d,t)=>drawTick(c,d,t,toneStyle,k))}
+function bowl(){playSnd("bowl",drawBowl)}
+function ding(){tick(1)}
 function chime(){bowl()}
+setTimeout(prepareSounds,300);
 
 /* ---------- 卡片列表 ---------- */
 function holdOf(p){return holdOverride||p.hold}
@@ -758,7 +805,7 @@ function drawPlayer(){
   $("#pSteps").innerHTML=stepsOf(p).join("<br>");
   const nx=pl.segs[pl.i+1];$("#pNext").textContent=nx?`${l.next}${nm(nx.p)}${nx.side===2?l.nextSw:""}`:l.last;
   const holding=pl.ph==="hold"||(pl.ph==="paused"&&pl.prev==="hold");
-  const final=holding&&warnSec>0&&pl.left>0&&pl.left<=warnSec;
+  const ws=Math.min(warnSec,Math.max(0,Math.floor(s.hold)-3));const final=holding&&ws>0&&pl.left>0&&pl.left<=ws;
   const tEl=$("#pTime");tEl.classList.toggle("final",final);
   tEl.innerHTML=final?`<span>${Math.ceil(pl.left)}</span><small>${l.sec}</small>`:`<span>${fmt(pl.left)}</span><small>${holding?l.remain:pl.ph==="enter"?l.holdFor+(lang==="en"?(s.hold<60?Math.round(s.hold)+" sec":s.hold/60+" min"):fmtMin(s.hold/60)):""}</small>`;
   $("#pArc").setAttribute("stroke-dashoffset",282.74*(1-pl.left/s.hold));
@@ -779,12 +826,13 @@ async function runSeg(){
     await wait(250);if(!alive())return;
     const now=performance.now();if(!pl.paused)pl.left-=(now-last)/1000;last=now;
     if(!saidMid&&s.hold>=120&&pl.left<=s.hold/2){saidMid=true;speak(L().mid)}
-    if(!saidEnd&&s.hold>=60&&pl.left<=Math.max(15,warnSec+8)&&pl.left>warnSec){saidEnd=true;speak(L().end)}
-    if(warnSec>0&&s.hold>warnSec+3&&!pl.paused&&pl.left>0.05){const sec=Math.ceil(pl.left);
-      if(sec<=warnSec&&sec!==lastTick){lastTick=sec;if(warnMode==="each")tick(sec);else if(!warned){warned=true;tick(sec)}}}
+    if(!saidEnd&&warnSec===0&&s.hold>=60&&pl.left<=15){saidEnd=true;speak(L().end)}
+    const ws=Math.min(warnSec,Math.max(0,Math.floor(s.hold)-3));
+    if(ws>0&&!pl.paused&&pl.left>0.05){const sec=Math.ceil(pl.left);
+      if(sec<=ws&&sec!==lastTick){lastTick=sec;const first=!warned;warned=true;if(warnMode==="each"||first)remind(sec,first)}}
     drawPlayer();
   }
-  chime();
+  endSound();
   if(pl.i<pl.segs.length-1){
     const nx=pl.segs[pl.i+1];
     pl.ph=nx.side===2?"sw":"rest";drawPlayer();
@@ -812,6 +860,7 @@ function unlockAudio(){
   if(unlocked)return;unlocked=true;
   try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
   try{ac()}catch(e){}
+  sndEls.forEach(el=>{try{el.src=SILENT;const p=el.play();if(p&&p.then)p.then(()=>el.pause()).catch(()=>{})}catch(e){}});
   try{if(synth){const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u)}}catch(e){}
 }
 ["touchend","pointerup","click","keydown"].forEach(ev=>document.addEventListener(ev,unlockAudio,{capture:true,passive:true}));
