@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>陰瑜伽練習卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: 單欄卡片牆 + 底部序列列 + 全螢幕練習播放器 */
+:root{
+  --bg:#ECEEF1; --surface:#F8F9FB; --ink:#1E2330; --muted:#5D6575; --line:#D5D9E0;
+  --accent:#34477E; --accent-ink:#FFFFFF;
+  --warm:#A9792A; --warm-bg:#F4ECDD;
+  --pose:#3B5A8C; --pose-bg:#E3E9F3;
+  --rest:#4F7461; --rest-bg:#E2ECE6;
+  --shadow:0 1px 2px rgba(30,35,48,.06),0 6px 20px rgba(30,35,48,.06);
+  --display:"Noto Serif TC","Songti TC",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#13161C; --surface:#1B1F27; --ink:#E5E8EE; --muted:#9AA2B2; --line:#2C323D;
+  --accent:#8EA2E0; --accent-ink:#121521;
+  --warm:#D9AC5E; --warm-bg:#2A2419; --pose:#8FAADB; --pose-bg:#1D2433; --rest:#8DB89F; --rest-bg:#1B2620;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13161C; --surface:#1B1F27; --ink:#E5E8EE; --muted:#9AA2B2; --line:#2C323D;
+  --accent:#8EA2E0; --accent-ink:#121521;
+  --warm:#D9AC5E; --warm-bg:#2A2419; --pose:#8FAADB; --pose-bg:#1D2433; --rest:#8DB89F; --rest-bg:#1B2620;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+.wrap{max-width:1080px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{padding-block:28px 8px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);line-height:1.15;margin:0;letter-spacing:.04em;text-wrap:balance}
+.lede{color:var(--muted);margin:6px 0 0;max-width:36em}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px}
+.settings{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px 14px;margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font-size:14px}
+.settings label{display:flex;gap:8px;align-items:center}
+.settings select,.settings input[type=range]{font:inherit;max-width:180px}
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;display:flex;flex-direction:column;gap:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:5px 14px;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+#q{flex:1;min-width:140px;font:inherit;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.presets{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.presets button{flex:none;border:1px dashed var(--line);background:transparent;border-radius:10px;padding:6px 12px;font-size:13px;text-align:left;line-height:1.4}
+.presets b{display:block;font-size:14px}
+.presets small{color:var(--muted)}
+h2{font-family:var(--display);font-size:20px;margin:22px 0 10px;display:flex;gap:10px;align-items:baseline}
+h2 small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;min-width:0;box-shadow:var(--shadow);text-align:left}
+.card .top{display:flex;gap:12px;align-items:flex-start}
+.num{font-family:var(--display);font-size:28px;line-height:1;font-weight:700;min-width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-variant-numeric:tabular-nums;background:var(--cbg);color:var(--c)}
+.card[data-cat=warm]{--c:var(--warm);--cbg:var(--warm-bg)}
+.card[data-cat=pose]{--c:var(--pose);--cbg:var(--pose-bg)}
+.card[data-cat=rest]{--c:var(--rest);--cbg:var(--rest-bg)}
+.name{min-width:0;flex:1}
+.name h3{margin:0;font-size:17px;font-weight:700;line-height:1.3}
+.name .en{font-size:12.5px;color:var(--muted)}
+.meta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px}
+.chip{border-radius:999px;padding:1px 9px;background:var(--bg);color:var(--muted)}
+.chip.c{background:var(--cbg);color:var(--c)}
+.card .acts{display:flex;gap:6px;margin-top:auto}
+.card .acts button{flex:1;border:1px solid var(--line);background:transparent;border-radius:8px;padding:6px 4px;font-size:13px}
+.card .acts .add[aria-pressed=true]{background:var(--c);border-color:var(--c);color:var(--surface)}
+.open{border:0;background:transparent;padding:0;text-align:left;display:block;width:100%}
+.empty{color:var(--muted);padding:30px 0}
+.guide{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.guide section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.guide h3{margin:0 0 8px;font-family:var(--display);font-size:17px}
+.guide dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.guide dt{font-weight:700}
+.guide dd{margin:0;color:var(--muted)}
+.guide p{margin:0;font-size:13.5px;color:var(--muted)}
+/* 底部序列列 */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock .in{max-width:1080px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.dock .info{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:0}
+.dock .info b{display:block;font-size:15px}
+.dock .info span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:10px 20px;font-weight:700}
+.primary:disabled{opacity:.4;cursor:default}
+/* 底部抽屜 */
+.scrim{position:fixed;inset:0;background:rgba(10,12,18,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:620px;max-height:88%;overflow:auto;border-radius:18px 18px 0 0;
+  padding:20px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+.sheet .hd{display:flex;gap:12px;align-items:flex-start}
+.sheet h3{margin:0;font-family:var(--display);font-size:24px;line-height:1.25}
+.x{margin-left:auto;border:0;background:var(--bg);border-radius:999px;width:34px;height:34px;flex:none;font-size:18px}
+.sheet ol{padding-left:1.4em;margin:12px 0}
+.sheet ol li{margin-bottom:6px}
+.caution{background:var(--warm-bg);border-radius:10px;padding:10px 12px;font-size:14px}
+.caution b{color:var(--warm)}
+.sheet .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.sheet .acts button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px}
+.sheet .acts .primary{border:0}
+.seq{list-style:none;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:6px}
+.seq li{display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+.seq li .n{font-variant-numeric:tabular-nums;color:var(--muted);width:2.2em;font-size:13px}
+.seq li .t{flex:1;min-width:0}
+.seq li .t small{color:var(--muted)}
+.seq li button{border:0;background:var(--bg);border-radius:8px;width:32px;height:32px}
+.seqpick{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seqpick select{font:inherit;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%;min-width:0;flex:1}
+.seqpick button{border:1px solid var(--line);background:transparent;border-radius:10px;padding:6px 12px;font-size:14px;flex:none}
+.nameinput{font:inherit;font-family:var(--display);font-size:22px;font-weight:700;width:100%;border:0;border-bottom:1px dashed var(--line);background:transparent;color:var(--ink);padding:6px 0;margin-top:8px}
+.stepper{display:flex;align-items:center;gap:2px;flex:none}
+.stepper .m{min-width:4.2em;text-align:center;font-variant-numeric:tabular-nums;font-size:14px;font-weight:700}
+.seq li .t{display:flex;flex-direction:column;line-height:1.35}
+.sheet ol.seq{padding-left:0}
+.sheet .acts .primary{border:0;background:var(--accent);color:var(--accent-ink)}
+.sheet .acts .primary:disabled{opacity:.4}
+.seq li{flex-wrap:wrap;row-gap:6px}
+@media (max-width:520px){.seq li .t{flex:1 1 calc(100% - 3em)}.seq li .stepper{margin-left:calc(2.2em + 10px);margin-right:auto}}
+.danger{color:#B4472F}
+/* 播放器 */
+.player{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));overflow:auto}
+.player .bar{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.player .prog{flex:1;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.player .prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;max-width:560px;margin:0 auto;width:100%;padding-block:16px}
+.stage .phase{font-size:13px;letter-spacing:.15em;color:var(--muted)}
+.stage h3{font-family:var(--display);font-size:clamp(26px,7vw,38px);margin:0;line-height:1.2;text-wrap:balance}
+.ring{position:relative;width:min(220px,58vw);aspect-ratio:1;max-width:100%}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .t{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:clamp(36px,11vw,52px);font-variant-numeric:tabular-nums}
+.stage .steps{font-size:14.5px;color:var(--muted);text-align:left;max-width:30em}
+.stage .next{font-size:13px;color:var(--muted)}
+.ctrls{display:flex;gap:12px;justify-content:center;align-items:center}
+.ctrls button{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:52px;height:52px;font-size:18px}
+.ctrls .play{width:68px;height:68px;background:var(--accent);color:var(--accent-ink);border:0;font-size:22px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:14px;z-index:50}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>陰瑜伽練習卡</h1>
+      <p class="lede">60 個體式，每張卡都能朗讀步驟。把卡片加進序列，系統會語音引導、計時，到點自動換下一式。</p>
+    </div>
+    <button class="ghost" id="setBtn" aria-expanded="false">語音與鈴聲</button>
+  </header>
+  <div class="settings" id="settings" hidden>
+    <label>聲音 <select id="voiceSel"></select></label>
+        <label>語速 <input type="range" id="rate" min="0.6" max="1.3" step="0.05" value="0.9"></label>
+    <label>新加入的停留 <select id="holdSel">
+      <option value="0">依卡片建議</option><option value="1">1 分鐘</option><option value="2">2 分鐘</option>
+      <option value="3">3 分鐘</option><option value="5">5 分鐘</option></select></label>
+    <label>結束前提醒 <select id="warnSel"><option value="0">不提醒</option><option value="3">3 秒</option><option value="5">5 秒</option><option value="10">10 秒</option><option value="15">15 秒</option></select></label>
+    <button class="ghost" id="testVoice">試聽語音</button>
+    <button class="ghost" id="testBell">試聽鈴聲</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="row">
+      <div class="seg" role="group" aria-label="分類">
+        <button data-f="all" aria-pressed="true">全部</button>
+        <button data-f="warm" aria-pressed="false">暖身</button>
+        <button data-f="pose" aria-pressed="false">體式</button>
+        <button data-f="rest" aria-pressed="false">修復</button>
+      </div>
+      <input id="q" type="search" placeholder="搜尋：髖、肩、扭轉、蝴蝶…" aria-label="搜尋體式">
+    </div>
+    <div class="presets" id="presets"></div>
+  </div>
+
+  <main id="list"></main>
+
+  <div class="guide">
+    <section>
+      <h3>停留時的身體訊號</h3>
+      <dl>
+        <dt>刺痛、針扎感</dt><dd>立刻離開姿勢</dd>
+        <dt>觸電感</dt><dd>離開後重新調整對位再進入</dd>
+        <dt>肌肉痠緊</dt><dd>可以留著，持續呼吸</dd>
+        <dt>組織被打開的鈍感</dt><dd>留下來，把呼吸送到那個部位</dd>
+      </dl>
+    </section>
+    <section>
+      <h3>練習提醒</h3>
+      <p>陰瑜伽每式通常停留 3–5 分鐘，進入前先找好對位，再放鬆不動。想離開姿勢的念頭常常代表你剛好在該在的地方，但疼痛不在此列。練完多喝水。</p>
+    </section>
+    <section>
+      <h3>安全須知</h3>
+      <p>內容是一般練習參考，不是醫療建議。有受傷、近期手術、懷孕或慢性疾病，先問醫師或合格老師。每張卡的「注意」列出常見禁忌，但不是完整清單。</p>
+    </section>
+  </div>
+</div>
+
+<div class="dock">
+  <div class="in">
+    <button class="info" id="seqOpen"><b id="seqTitle">我的序列：0 式</b><span id="seqSub">點卡片上的「＋ 加入」開始排課</span></button>
+    <button class="primary" id="seqPlay" disabled>開始練習</button>
+  </div>
+</div>
+
+<div class="scrim" id="detail" hidden></div>
+<div class="scrim" id="seqSheet" hidden></div>
+<div class="player" id="player" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// [編號, 中文名, 英文名, 部位, 建議停留(分), 需換邊, 步驟, 注意]
+const P=[
+[1,"腳踝伸展","Ankle Stretch","腳踝・足背",1,0,"跪坐在腳跟上，腳背平貼地面。|身體重心慢慢往後，感受腳踝前側被拉開。|想加深，可以雙手撐在身後，把膝蓋微微抬起。","腳踝或腳趾受傷時避免。腳踝很敏感，動作要輕。"],
+[2,"身體波浪","Body Waves","全身・脊椎",1,0,"面向牆站好。|鼻尖先往牆靠近，接著下巴、胸口、上腹、下腹、髖部依序跟上，像一道波浪穿過身體。|再反過來從髖部往上做。熟練後可以離開牆練習。","容易頭暈、有眩暈或脊椎受傷時小心。"],
+[3,"貓牛式","Cat-Cow","脊椎・背",1,0,"四足跪姿，手在肩下、膝在髖下。|吸氣，骨盆往後傾，背往下沉，胸口向前，視線往上。|吐氣，骨盆內收，背拱起，下巴靠近胸口，看向肚臍。|跟著呼吸重複，做到舒服為止。","頸部不適就保持頸部中立。手腕弱或膝蓋不適，可把墊子折起墊在膝下。"],
+[4,"胸口波浪","Chest Waves","胸椎",1,0,"坐好或站穩，頭和髖部保持不動。|只讓胸口向前、向上、向後、向下畫出波浪。|動作小而慢。","剛做完整骨治療或胸椎受傷時暫停。"],
+[5,"頭部波浪","Head Waves","頸椎",1,0,"胸口和髖部保持不動。|只讓頭部輕輕畫出前後的波浪。|幅度保持很小。","剛做完整骨治療或頸椎受傷時暫停。"],
+[6,"髖部波浪","Hips Waves","下背・骨盆",1,0,"頭和胸口保持不動。|只讓髖部做前後的波浪。|下背盡量保持平順，不要變成轉呼拉圈。","剛做完整骨治療或下背受傷時暫停。"],
+[7,"脊椎捲起","Spine Roll Up","脊椎・腿後",1,0,"從站姿前彎開始，膝蓋微彎。|從尾椎開始，一節一節把脊椎捲回站姿，頭最後抬起。|也可以反方向一節一節往下捲。閉上眼睛會更專注。","椎間盤突出或頸部受傷時避免。血壓偏高或偏低，起身要慢。"],
+[8,"手腕暖身","Wrist Warm-Up","手腕",1,0,"四足跪姿，手背貼地，手指朝向膝蓋，感受手腕伸展。|可吐氣彎手肘、吸氣伸直。|接著手指朝內、再朝外，慢慢調整雙手距離。","手腕受傷時避免。手腕很敏感，動作溫和。"],
+[9,"香蕉式","Banana Pose","側腰",3,1,"仰躺，把雙腳和上半身一起移向墊子同一側，身體彎成月牙形。|腳踝交叉，雙手舉過頭，可以互抱手肘。|肩膀和臀部保持貼地，把呼吸送進被拉長的那一側腰。","下背、頸部不適或曾髖關節脫臼時小心。"],
+[10,"腹部扭轉","Belly Twist","脊椎・下背",3,1,"仰躺屈膝，雙膝一起倒向一側。|雙肩保持貼地，手臂可打開成 T 字。|膝蓋碰不到地，就墊一塊磚。","薦髂關節或背痛選溫和版本並加墊支撐；肩頸不適調整手臂與視線。孕期避免。"],
+[11,"斷翅式","Broken Wings","上背・肩胛",3,0,"從人面獅身式開始，前臂交疊，雙手扶住對側手肘。|手臂維持在胸口正下方，讓兩片肩胛骨之間慢慢展開。|額頭放在磚或靠墊上，放鬆。","膝、背、手臂、手肘或肩膀受傷時避免。體重較重者不要停留太久。"],
+[12,"蝴蝶式","Butterfly","髖・下背",5,0,"坐姿，腳掌相對，腳跟放在離骨盆舒服的距離。|先延長脊椎，再從髖關節慢慢前傾。|讓背自然變圓，頭和手臂放鬆，可在前方放靠墊撐住。","鼠蹊或膝蓋受傷時小心。孕期在膝下墊枕頭。"],
+[13,"貓拉尾巴","Cat Pulling Its Tail","大腿前側・脊椎",3,1,"側躺進入簡單的扭轉。|下方腿彎曲，腳跟靠近臀部，可用手抓住腳。|上方腿可伸直並抓腳尖加深，太難就保持彎曲、手放膝上。","下背疼痛或坐骨神經痛時小心。"],
+[14,"毛毛蟲式","Caterpillar","腿後・背",5,0,"雙腿伸直坐好，坐骨貼地。|延長脊椎，從髖部往前折，讓背部自然放圓。|腿後太緊就在膝下墊捲毛巾，也可在大腿上放靠墊趴著。","髖、腿後或鼠蹊受傷時小心。孕期雙腿打開，只做到八成。"],
+[15,"嬰兒式","Child's Pose","下背・髖",3,0,"跪坐，膝蓋併攏或打開都可以。|臀部往腳跟沉，上半身往前趴下。|額頭著地或放在靠墊上，手臂放身側或往前延伸。","腹瀉時避免。孕期雙膝打開並加墊。膝、踝、髖不適可在臀下墊枕頭。"],
+[16,"嬰兒式側伸展","Child's Pose Side Stretch","側腰・肩",3,1,"從嬰兒式，雙手一起走向墊子左側，右手疊在左手上。|臀部持續往下沉。|把呼吸送進右側腰。回到中間停一下再換邊。","肩膀、肋骨、膝、踝受傷或孕期時小心。"],
+[17,"建設性休息","Constructive Rest","下背・全身",3,0,"仰躺屈膝，腳掌平放，雙腳打開約墊子寬。|讓雙膝往中間互相靠著休息。|雙腳保持平行；膝蓋靠不攏就讓腳近一點。","急性背痛時小心。"],
+[18,"鹿式","Deer Pose","髖",3,1,"坐姿，一腿在前彎曲，另一腿擺到身後，前後膝蓋都接近九十度。|前腳靠近後膝；做不到九十度就調到舒服的角度。|可以坐直呼吸，或從髖部前傾趴在前腿上。","膝蓋不適時從髖部轉動前腿，太深就讓前腳靠近鼠蹊。髖關節脫臼史避免。"],
+[19,"鑽石式","Diamond Pose","大腿外側・下背",3,0,"坐姿，腳掌相對，雙腳往前推遠，讓雙腿形成菱形。|延長脊椎。|從髖部往前傾，用道具撐住身體。","踝、膝、髖受傷時小心。"],
+[20,"蜻蜓式","Dragonfly / Straddle","大腿內側・腿後",5,0,"坐姿，雙腿大大打開。|先勾腳尖保護膝蓋，雙手往前走，從髖部往前折。|找到位置後放鬆雙腳。骨盆往後倒或背太圓，就坐在磚或靠墊上。","可能加重坐骨神經痛。背部不宜前彎就保持背直。內收肌或腿後拉傷時避免。"],
+[21,"火木式","Fire Log / Square","髖・臀",3,1,"坐姿，把一隻小腿疊在另一隻上方，排成方形。|膝蓋和腳盡量上下對齊，做不到就用磚或靠墊填空間。|這個式子對多數人都很有挑戰，溫柔對待自己。","踝、膝、髖有問題時小心。"],
+[22,"站姿前彎","Standing Forward Fold","腿後・背",3,0,"站好，膝蓋微彎。|上半身往前垂掛在雙腿上。|重量平均分在腳跟與腳趾，頭頸放鬆，可輕輕左右搖晃。起身要慢。","椎間盤或背傷避免。腿後拉傷保持膝蓋彎曲。容易頭暈就雙腳略開、慢慢起身。胃酸問題改做平背半前彎。"],
+[23,"青蛙式","Frog Pose","大腿內側・鼠蹊",3,0,"從跪坐開始，膝蓋往兩側打開到舒服的寬度。|膝蓋對齊髖部，腳對齊膝蓋。|可用手撐，或放低到手肘在肩下。骨盆不前推也不後坐，讓伸展留在鼠蹊。","內收肌或腿後拉傷，膝、髖、腰椎手術史時避免。"],
+[24,"半鞋帶式","Half Shoelace","髖・臀外側",3,1,"雙腿伸直坐好。|右膝彎曲疊在左膝上方，右腳外側放在左臀旁，右膝朝向左腳。|可以坐直，也可以延長後往前折。","髂脛束拉傷或椎間盤疼痛時小心。"],
+[25,"半劈腿","Half Split","腿後",3,1,"四足跪姿，右腳往前放到雙手之間，腳尖朝上。|臀部往後推，保持兩側髖部方正。|前腿盡量伸直，後膝在髖下；腹部靠向大腿加深。","腿後拉傷或髖部手術後避免。"],
+[26,"快樂嬰兒","Happy Baby","髖・下背",3,0,"仰躺，雙膝抱向胸口。|雙手抓住腳外側，腳底朝向天花板。|手肘輕推膝蓋內側，下背和膝蓋往地面沉。抓腳踝會比較輕鬆。","膝或髖受傷時小心。孕中後期留意頭暈或腿麻，必要時改側躺。"],
+[27,"頭碰膝前彎","Head to Knee","腿後・側背",3,1,"坐姿，一腿往前伸直，另一隻腳掌貼在伸直腿的大腿內側。|背保持延長，從髖部朝伸直腿往前折。|下腹靠向大腿。輕鬆版把腳放在小腿內側。","椎間盤疼痛或腿後拉傷時小心。"],
+[28,"英雄式","Hero Pose","大腿前側・腳踝",3,0,"坐在地上或磚上，膝蓋併攏，腳跟放在臀部兩側。|可往後靠在抱枕上，或直接躺到地面。|膝蓋不能離地；離地就退回一點。","膝蓋或腳踝疼痛、受傷時避免。"],
+[29,"抱膝式","Knees to Chest","下背",3,0,"仰躺，雙手抱住雙膝靠近胸口，或手臂互抱手肘。|肩膀和下背放鬆貼地。|讓整條脊椎都跟地面接觸。","孕期第一期後避免。近期腹部手術、疝氣、膝或脊椎受傷時小心。"],
+[30,"靠牆抬腿","Legs up the Wall","腿・神經系統",5,0,"臀部靠近牆，距離由你決定。|躺下，把雙腿沿著牆抬起。|可在臀下墊靠墊支撐下背，完全放鬆。","心臟問題先問醫師。青光眼或視網膜剝離避免。孕中後期留意頭暈。"],
+[31,"蜥蜴式","Lizard Pose","髖屈肌・鼠蹊",3,1,"從平板式，右膝收向胸口，右腳踩到右手外側。|右膝往前，左腳跟往後延伸。|可放下後膝，再降到前臂或磚上加深。","踝、膝、髖、脊椎、肋骨、手腕、手肘、肩或頸受傷時避免。"],
+[32,"開翼式","Open Wing","胸・肩前側",3,1,"趴下，右手臂往側邊伸直，與肩同高。|左手推地，讓身體慢慢翻向右側。|想加深就彎左膝、左腳踩在身後。肩膀很容易過度，少一點就好。","肩或髖受傷，或膝、肘、手臂、腰、肩、背近期手術時避免。"],
+[33,"犁式","Plough Pose","脊椎・肩頸後側",3,0,"從肩倒立開始，讓雙腿往頭後方落。|重量放在肩膀上，雙手彎肘扶住下背。|腳尖慢慢放到頭後地面，或彎膝讓膝蓋靠近耳朵。","背或脊椎受傷、頸部脆弱、孕期、青光眼或視網膜剝離時避免。"],
+[34,"融心式","Melting Heart / Puppy","胸・肩・上背",3,0,"四足跪姿，雙手往前走，前臂放到地上，手肘打開。|臀部保持在膝蓋正上方。|讓胸口往地面融化，額頭放磚上，或下巴貼地加深。","肩、髖、膝疼痛或受傷，或孕晚期時避免。"],
+[35,"仰臥蝴蝶","Reclining Butterfly","髖・鼠蹊",5,0,"仰躺，屈膝，腳掌相對。|膝蓋往兩側自然打開。|停留超過五分鐘時，建議在膝下墊支撐。","鼠蹊或膝蓋受傷時一定要在膝下與大腿下加墊。"],
+[36,"仰臥鴿式","Reclining Pigeon","臀・髖外側",3,1,"仰躺，右腳踩地，左膝收向胸口。|左腳踝放到右膝上方，左膝往前推，感受臀部伸展。|想加深就抬起右腳，抱住右大腿後側或小腿。","髖、膝、下背受傷或近期腹部手術時小心。孕期第二期後避免。"],
+[37,"仰臥樹式","Reclining Tree","髖・大腿內側",3,1,"仰躺，右膝收向胸口後往右側打開。|右腳掌貼在左大腿或小腿內側，不要貼膝蓋。|可在右膝下墊磚或靠墊。","膝蓋受傷或手術後小心。"],
+[38,"扭轉頭碰膝","Revolved Head-to-Knee","側腰・腿後",3,1,"坐姿雙腿打開，右腳掌貼在左大腿內側。|上半身側彎倒向左腿，胸口保持朝前。|可在左膝旁放磚，手肘靠上去。把呼吸送進右側身體，一路到腋下。","膝、髖、肋骨受傷時小心（膝傷可雙腿都伸直）。頸部疼痛時小心。"],
+[39,"海豹式","Seal Pose","下背・腹部",3,0,"從人面獅身式，雙手往前外側斜放。|手掌推地，慢慢抬起胸口和腹部。|頸部與脊椎一直線，肩膀遠離耳朵，下背放鬆。可在髖下墊靠墊。","急性背痛改做人面獅身式。肩頸疼痛或受傷時避免。孕期需加墊避免壓腹。"],
+[40,"坐姿頸側伸展","Seated Head Stretch 1","頸側・斜方肌",2,1,"坐好，右耳往右肩倒，肩膀放鬆。|左肩往下沉，加深左側頸部伸展。|下巴放鬆。換邊前先做頸部前伸展過渡。","頸椎受傷時避免。"],
+[41,"坐姿頸前伸展","Seated Head Stretch 2","頸後",2,0,"坐好，讓下巴落向胸口。|雙手可以輕放後腦，但不要往下壓。|讓重力工作，下巴放鬆。","頸椎受傷時避免。"],
+[42,"坐姿扭轉","Seated Twist","脊椎・臀",3,1,"坐姿屈膝，左腳跟放到右臀外側（不是臀下）。|右腳跨過左膝，踩在左膝外側；左手扶右膝。|脊椎往上延伸，從背中段向右扭轉，膝和手互相輕推。臀部太緊可把左腿伸直。","下背、薦椎或脊椎受傷或急性疼痛，頸、髖、膝受傷，或孕期時避免。"],
+[43,"鞋帶式","Shoelace / Cow Face","髖・臀",3,1,"四足跪姿，右膝放到左膝後方。|雙腳往兩側分開，坐回兩腳之間的地上或磚上，膝蓋上下堆疊。|可往前折，或雙手在背後相扣。下方腿伸直比較溫和。","膝或骨盆受傷時小心。坐骨神經痛或下背受傷時坐高、不要前彎。孕期第一期後不要前折。"],
+[44,"睡天鵝","Sleeping Swan","臀・髖外旋",5,1,"四足跪姿，右膝往前放到右手腕外側，右腳往左手方向放。|左腿往後伸直，臀部往地面沉；右坐骨下可墊磚。|上半身往前趴到前臂或地面。膝蓋不舒服就讓腳跟靠近身體。","膝或髖疼痛、受傷時小心。"],
+[45,"睡毗濕奴","Sleeping Vishnu","腿後・大腿內側",3,1,"右側躺，彎右手肘撐住頭，或直接躺在手臂上。|左腿往上抬，用左手抓住腳或小腿，抓不到用伸展帶。|右膝可微彎幫助平衡。","頸、肩、肋骨受傷，或坐骨神經痛、椎間盤問題時小心。"],
+[46,"蝸牛式","Snail","脊椎・背",3,0,"仰躺，抬起臀部，把雙腿帶過頭頂。|雙手彎肘扶住下背。|讓背部變圓，慢慢讓膝蓋靠近耳朵。","急性背痛或膝痛、頸或脊椎受傷、孕期時避免。"],
+[47,"人面獅身","Sphinx","下背・腹部",3,0,"趴下，手肘放在肩膀正下方，前臂貼地。|前臂推地，胸口往前送。|頸部延長，可微收下巴或看向兩手拇指間；大腳趾可併攏。","背或肩受傷、慢性疼痛，孕期或近期腹部手術時避免。"],
+[48,"蹲式","Squat Pose","髖・腳踝",3,0,"雙腳比髖略寬，腳尖和膝蓋朝同一方向，往下蹲。|腳跟抬起的話，在腳跟下墊毯子。|手肘推膝蓋內側，雙手合十在胸前。頸部緊就讓下巴落向胸口。","膝痛、慢性下背痛、嚴重坐骨神經痛、髖傷或近期手術時避免。"],
+[49,"支撐側彎","Supported Banana","側腰・肋間",3,1,"準備厚抱枕或靠墊。|側躺在抱枕上，抱枕放在髖骨上方、肋骨下方。|雙手舉過頭加深側身伸展；雙腿可併攏或前後錯開。","肋骨受傷或手術後避免。"],
+[50,"支撐橋式","Supported Bridge","下背・髖屈肌",3,0,"仰躺屈膝，腳掌踩地。|抬起臀部，把磚或抱枕放在薦骨下方，不是下背。|膝蓋可保持彎曲或伸直。應該很舒服，不舒服就調整。","髖、下背、膝、頸受傷，青光眼或視網膜剝離時小心。"],
+[51,"仰臥扭轉","Supine Spinal Twist","脊椎・臀",3,1,"仰躺，臀部稍往右移。|右膝抱向胸口，用左手把右膝帶向左側地面。|右手往側邊打開，雙肩貼地，視線看向右手。可在右膝下墊磚。","薦髂關節或背痛、肩頸受傷時調整。孕期避免。"],
+[52,"穿針式","Thread the Needle","肩後・上背",3,1,"四足跪姿，吸氣右手往上舉。|吐氣，右手從左腋下穿過去，右肩放到墊上，再放頭。|臀部保持在膝上。左手可往前延伸，膝蓋痛可墊毯子。","背、肋骨、頸、肩或膝慢性疼痛或受傷時小心。"],
+[53,"腳趾蹲","Toe Squat","腳底・腳趾",1,0,"四足跪姿，所有腳趾勾起踩地，朝向前方。|慢慢坐回腳跟上；上半身越往後越強烈。|想減輕就雙手扶磚往前傾一點。這個式子很強烈，一兩分鐘就夠。","腳、腳踝或膝蓋有傷或近期手術時避免。"],
+[54,"烏龜式","Tortoise","背・腿後・肩",3,0,"坐姿，雙膝彎曲，雙腳大開踩地。|手臂從膝蓋下方穿出，手指朝後方。|慢慢往前推腳跟伸直雙腿，背保持平，上半身往地面降。用同樣路徑退出。","嚴重背痛、椎間盤突出、坐骨神經痛，肩、手臂、髖受傷，或孕期時避免。"],
+[55,"扭轉龍式","Twisted Dragon","髖屈肌・胸椎",3,1,"四足跪姿，右腳踩到右手外側，膝蓋對齊腳踝。|右手放右膝，膝往前推，下背不要塌。|左手撐地或磚，胸口往上轉，視線看向右肩後方。","膝、髖、踝受傷（後膝可墊毯）。脊椎或肋骨受傷時不要扭轉，胸口朝前。"],
+[56,"扭轉樹根","Twisted Roots","脊椎・臀外側",3,1,"仰躺屈膝，腳掌踩地。|右腿跨過左腿，雙腿一起倒向左側。|雙肩貼地，視線看向右側，手臂打開或放在身側。","背、脊椎、肋骨或頸部受傷或疼痛時小心。孕期避免。"],
+[57,"大休息","Corpse Pose","全身・神經系統",5,0,"仰躺，雙腳自然倒向兩側，手臂放在身旁。|放掉身體所有用力。|用鼻子吸氣、嘴巴吐氣三次，然後讓呼吸自然進出。","孕中後期改側躺，不要停太久。有呼吸問題在頭和胸口下墊靠墊。"],
+[58,"俯臥大休息","Reverse Corpse","全身",5,0,"趴下。|雙手交疊當作額頭的枕頭，或放在身側、頭上。|頭若轉向一側，中途換到另一側。","孕期、近期腹部手術或疝氣時避免。頸部受傷時小心。"],
+[59,"支撐仰臥蝴蝶","Supported Reclined Butterfly","胸・髖",5,0,"抱枕或靠墊縱向放在脊椎下方。|腳掌相對，膝蓋往兩側打開，膝下也可墊靠墊。|頭有支撐、下巴微收，肩膀往地面落。","鼠蹊、骨盆或髖受傷時避免。膝痛就墊高膝蓋或把腿伸直。"],
+[60,"支撐大休息","Supported Savasana","下背・全身",5,0,"仰躺，讓兩片肩胛骨之間鬆開。|膝下放抱枕、磚或枕頭，大腿自然往外轉。|放鬆臉、肩膀和髖部，減輕下背壓力。","有呼吸問題在頭和胸口下墊靠墊。"]
+];
+const CAT=id=>id<=8?"warm":id>=57?"rest":"pose";
+const CATN={warm:"暖身",pose:"體式",rest:"修復"};
+const byId=Object.fromEntries(P.map(p=>[p[0],{id:p[0],zh:p[1],en:p[2],area:p[3],hold:p[4],sides:!!p[5],steps:p[6].split("|"),caution:p[7],cat:CAT(p[0])}]));
+const PRESETS=[
+ {n:"睡前放鬆",ids:[17,29,36,51,35,30,60]},
+ {n:"開髖",ids:[3,12,20,44,18,26,57]},
+ {n:"肩頸舒緩",ids:[5,40,41,34,52,11,57]},
+ {n:"下背與脊椎",ids:[3,7,47,39,15,56,60]},
+ {n:"久坐腿部",ids:[1,22,25,31,45,30,57]}
+];
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+let filter="all",query="";
+let rate=store.get("yin.rate",0.9),holdOverride=store.get("yin.hold",0),warnSec=store.get("yin.warn",5);
+$("#rate").value=rate;$("#holdSel").value=String(holdOverride);$("#warnSel").value=String(warnSec);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let seqs=store.get("yin.seqs",null);
+if(!Array.isArray(seqs)||!seqs.length){const old=store.get("yin.seq",[]).filter(i=>byId[i]);seqs=[{id:Date.now(),name:"我的序列",items:old.map(id=>({id,min:byId[id].hold}))}]}
+seqs.forEach(q=>{q.items=(q.items||[]).filter(it=>byId[it.id])});
+let curId=store.get("yin.cur",seqs[0].id);if(!seqs.find(q=>q.id===curId))curId=seqs[0].id;
+const cur=()=>seqs.find(q=>q.id===curId);
+const inCur=id=>cur().items.some(it=>it.id===id);
+const MINS=[0.5,1,1.5,2,2.5,3,4,5,6,7,8,10,12,15,20];
+const fmtMin=m=>m<1?`${Math.round(m*60)} 秒`:`${m} 分`;
+
+/* ---------- 語音（裝置內建，優先台灣中文） ---------- */
+let voiceName=store.get("yin.voice","");
+const synth=window.speechSynthesis;let voice=null;
+function loadVoices(){
+  if(!synth)return;
+  const vs=synth.getVoices().filter(v=>/^zh|cmn/i.test(v.lang));
+  const sel=$("#voiceSel");sel.innerHTML="";
+  if(!vs.length){sel.innerHTML='<option>系統預設中文</option>';return}
+  const rank=v=>(/TW|Hant/i.test(v.lang)?0:/HK/i.test(v.lang)?10:20)+(/Mei-?Jia|美佳|Enhanced|Premium|增強|Neural|Natural|Google/i.test(v.name)?0:5);
+  vs.sort((a,b)=>rank(a)-rank(b));
+  vs.forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=`${v.name}（${v.lang}）`;sel.appendChild(o)});
+  voice=vs.find(v=>v.name===voiceName)||vs[0];sel.value=voice.name;
+}
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices}
+$("#voiceSel").onchange=e=>{voiceName=e.target.value;store.set("yin.voice",voiceName);voice=synth.getVoices().find(v=>v.name===voiceName)||voice};
+$("#rate").oninput=e=>{rate=+e.target.value;store.set("yin.rate",rate)};
+$("#holdSel").onchange=e=>{holdOverride=+e.target.value;store.set("yin.hold",holdOverride)};
+$("#warnSel").onchange=e=>{warnSec=+e.target.value;store.set("yin.warn",warnSec)};
+$("#testBell").onclick=()=>{ding();setTimeout(bowl,1600)};
+$("#setBtn").onclick=e=>{const s=$("#settings");s.hidden=!s.hidden;e.target.setAttribute("aria-expanded",!s.hidden)};
+$("#testVoice").onclick=()=>{stopSpeech();speak("吸氣，延長脊椎。吐氣，放鬆肩膀。")};
+
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+let speechGen=0;
+function speakOne(text,gen){
+  return new Promise(res=>{
+    if(!synth||gen!==speechGen)return res();
+    const u=new SpeechSynthesisUtterance(text);u.lang=voice?voice.lang:"zh-TW";if(voice)u.voice=voice;u.rate=rate;
+    let done=false;const fin=()=>{if(!done){done=true;clearTimeout(t);res()}};
+    const t=setTimeout(fin,(text.length*0.32/rate+3)*1000);
+    u.onend=fin;u.onerror=fin;
+    try{synth.resume()}catch(e){}synth.speak(u);
+  });
+}
+async function speak(text){
+  if(!synth){toast("這個瀏覽器不支援語音朗讀");return}
+  const gen=speechGen;
+  const parts=text.split(/(?<=[。！？；])/).map(s=>s.trim()).filter(Boolean);
+  for(const p of parts){if(gen!==speechGen)return;await speakOne(p,gen)}
+}
+function stopSpeech(){speechGen++;if(synth)synth.cancel()}
+
+/* 鈴聲：結束前「叮叮」＋結束時頌缽 */
+let actx=null,master=null;
+function ac(){
+  if(!actx){
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    master=actx.createGain();master.gain.value=0.9;master.connect(actx.destination);
+    try{const r=actx.sampleRate,len=Math.floor(r*2.8),b=actx.createBuffer(2,len,r);
+      for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.2)}
+      const conv=actx.createConvolver();conv.buffer=b;const wet=actx.createGain();wet.gain.value=0.32;
+      master.connect(conv);conv.connect(wet);wet.connect(actx.destination)}catch(e){}
+  }
+  if(actx.state!=="running"&&actx.resume)actx.resume();
+  return actx;
+}
+function strike(f,t,vol,dur,partials){
+  partials.forEach(([ratio,amp,decay])=>{
+    const o=actx.createOscillator(),g=actx.createGain(),end=t+dur*decay;
+    o.type="sine";o.frequency.value=f*ratio;
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol*amp,t+0.005);g.gain.exponentialRampToValueAtTime(0.0001,end);
+    o.connect(g);g.connect(master);o.start(t);o.stop(end+0.05);
+  });
+}
+const DING=[[1,1,1],[2,0.22,0.5],[3,0.1,0.32],[4.16,0.05,0.2]];
+const BOWL=[[1,1,1],[2.71,0.42,0.62],[5.15,0.16,0.36],[8.4,0.05,0.2]];
+function ding(){try{const a=ac(),t=a.currentTime+0.03;strike(1046.5,t,0.2,1.8,DING);strike(1318.5,t+0.26,0.2,2.4,DING)}catch(e){}}
+function bowl(){try{const a=ac(),t=a.currentTime+0.03;strike(392,t,0.24,6.5,BOWL);strike(393.6,t,0.16,6.5,BOWL)}catch(e){}}
+function chime(){bowl()}
+
+/* ---------- 卡片列表 ---------- */
+function holdOf(p){return holdOverride||p.hold}
+function cardHTML(p){
+  const inSeq=inCur(p.id);
+  return `<article class="card" data-cat="${p.cat}">
+    <button class="open" data-open="${p.id}" aria-label="查看 ${p.zh}">
+      <div class="top"><div class="num">${p.id}</div><div class="name"><h3>${p.zh}</h3><div class="en">${p.en}</div></div></div>
+    </button>
+    <div class="meta"><span class="chip c">${CATN[p.cat]}</span><span class="chip">${p.area}</span><span class="chip">${p.hold} 分</span>${p.sides?'<span class="chip">左右各一次</span>':""}</div>
+    <div class="acts"><button data-say="${p.id}">▶ 朗讀</button><button class="add" data-add="${p.id}" aria-pressed="${inSeq}">${inSeq?"✓ 已加入":"＋ 加入"}</button></div>
+  </article>`;
+}
+function renderList(){
+  const q=query.trim();
+  const items=Object.values(byId).filter(p=>(filter==="all"||p.cat===filter)&&(!q||(p.zh+p.en+p.area+p.steps.join("")).toLowerCase().includes(q.toLowerCase())));
+  if(!items.length){$("#list").innerHTML='<p class="empty">找不到符合的體式，換個關鍵字試試。</p>';return}
+  let html="";
+  for(const c of ["warm","pose","rest"]){
+    const g=items.filter(p=>p.cat===c);if(!g.length)continue;
+    const sub={warm:"在靜態停留前讓身體醒過來",pose:"每式停留 3–5 分鐘，放鬆不動",rest:"用道具撐好身體，收尾整合"}[c];
+    html+=`<h2>${CATN[c]} <small>${g.length} 式・${sub}</small></h2><div class="grid">${g.map(cardHTML).join("")}</div>`;
+  }
+  $("#list").innerHTML=html;
+}
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{filter=b.dataset.f;document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()});
+$("#q").oninput=e=>{query=e.target.value;renderList()};
+$("#presets").innerHTML=PRESETS.map((p,i)=>{const m=p.ids.reduce((s,id)=>s+holdOf(byId[id])*(byId[id].sides?2:1),0);
+  return `<button data-preset="${i}"><b>${p.n}</b><small>${p.ids.length} 式・約 ${m} 分</small></button>`}).join("");
+
+function sayCard(p){stopSpeech();speak(`${p.zh}。${p.steps.join("")}${p.sides?"記得兩邊都做。":""}`)}
+function toggleSeq(id){const it=cur().items,i=it.findIndex(x=>x.id===id);if(i>=0)it.splice(i,1);else it.push({id,min:holdOf(byId[id])});saveSeq();toast(i>=0?`已從「${cur().name}」移除 ${byId[id].zh}`:`已加入「${cur().name}」`)}
+function persist(){store.set("yin.seqs",seqs);store.set("yin.cur",curId)}
+function saveSeq(){persist();renderList();renderDock();if(!$("#seqSheet").hidden)renderSeqSheet()}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-open],[data-say],[data-add],[data-preset]");if(!t)return;
+  if(t.dataset.open)openDetail(byId[t.dataset.open]);
+  else if(t.dataset.say)sayCard(byId[t.dataset.say]);
+  else if(t.dataset.add)toggleSeq(+t.dataset.add);
+  else if(t.dataset.preset){const p=PRESETS[t.dataset.preset];let q=seqs.find(x=>x.name===p.n);
+    if(!q){q={id:Date.now(),name:p.n,items:p.ids.map(id=>({id,min:holdOf(byId[id])}))};seqs.push(q);toast(`已新增序列「${p.n}」`)}else toast(`已切換到「${p.n}」`);
+    curId=q.id;saveSeq();renderSeqSheet();$("#seqSheet").hidden=false}
+});
+
+/* ---------- 詳細卡 ---------- */
+function openDetail(p){
+  const d=$("#detail");const inSeq=inCur(p.id);
+  d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${p.zh}">
+    <div class="hd"><div class="card" data-cat="${p.cat}" style="padding:0;border:0;box-shadow:none;background:none"><div class="num">${p.id}</div></div>
+      <div><h3>${p.zh}</h3><div class="en" style="color:var(--muted)">${p.en}</div></div><button class="x" data-close aria-label="關閉">×</button></div>
+    <div class="meta" style="margin-top:10px"><span class="chip">${CATN[p.cat]}</span><span class="chip">${p.area}</span><span class="chip">建議停留 ${p.hold} 分</span>${p.sides?'<span class="chip">左右各一次</span>':""}</div>
+    <ol>${p.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+    <div class="caution"><b>注意　</b>${p.caution}</div>
+    <div class="acts"><button class="primary" id="dPlay">▶ 朗讀步驟</button><button id="dTimer">計時練習 ${holdOf(p)} 分</button><button id="dAdd">${inSeq?"從序列移除":"＋ 加入序列"}</button></div>
+  </div>`;
+  d.hidden=false;
+  $("#dPlay").onclick=()=>sayCard(p);
+  $("#dTimer").onclick=()=>{closeDetail();startPlayer([{id:p.id,min:holdOf(p)}])};
+  $("#dAdd").onclick=()=>{toggleSeq(p.id);openDetail(p)};
+}
+function closeDetail(){$("#detail").hidden=true;stopSpeech()}
+$("#detail").onclick=e=>{if(e.target.id==="detail"||e.target.closest("[data-close]"))closeDetail()};
+
+/* ---------- 序列（可存多組，每式各自設定時間） ---------- */
+function seqMinutes(items){const m=items.reduce((s,it)=>s+it.min*(byId[it.id].sides?2:1),0);return Math.round(m*10)/10}
+function renderDock(){
+  const q=cur();
+  $("#seqTitle").textContent=`${q.name}：${q.items.length} 式${q.items.length?`・約 ${seqMinutes(q.items)} 分`:""}`;
+  $("#seqSub").textContent=q.items.length?q.items.map(it=>byId[it.id].zh).join(" → "):"點卡片上的「＋ 加入」，或選一組練習組合";
+  $("#seqPlay").disabled=!q.items.length;
+}
+let delArm=false;
+function renderSeqSheet(){
+  const s=$("#seqSheet"),q=cur(),it=q.items;
+  s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="我的序列">
+    <div class="hd"><div style="flex:1;min-width:0">
+      <div class="seqpick"><select id="seqSel" aria-label="切換序列">${seqs.map(x=>`<option value="${x.id}" ${x.id===curId?"selected":""}>${esc(x.name)}（${x.items.length} 式）</option>`).join("")}</select>
+        <button id="sNew">＋ 新序列</button></div>
+      <input class="nameinput" id="seqName" value="${esc(q.name)}" aria-label="序列名稱" maxlength="30">
+      <div style="color:var(--muted);font-size:14px;margin-top:4px">${it.length} 式・約 ${seqMinutes(it)} 分鐘・點名稱可改名，按 − ＋ 調整每式時間</div>
+    </div><button class="x" data-close aria-label="關閉">×</button></div>
+    ${it.length?`<ol class="seq">${it.map((x,i)=>{const p=byId[x.id];return `<li><span class="n">${i+1}</span><span class="t">${p.zh}<small>${p.sides?"左右各一次":" "}</small></span>
+      <span class="stepper"><button data-dm="${i},-1" aria-label="減少時間">−</button><span class="m">${fmtMin(x.min)}</span><button data-dm="${i},1" aria-label="增加時間">＋</button></span>
+      <button data-mv="${i},-1" aria-label="上移">↑</button><button data-mv="${i},1" aria-label="下移">↓</button><button data-rm="${i}" aria-label="移除">×</button></li>`}).join("")}</ol>`
+      :'<p class="empty">這組還沒有體式。關閉後在卡片上點「＋ 加入」。</p>'}
+    <div class="acts"><button class="primary" id="sPlay" ${it.length?"":"disabled"}>開始練習</button><button id="sClear">清空</button>
+      <button id="sDel" class="danger" ${seqs.length<2?"disabled":""}>${delArm?"再按一次確認刪除":"刪除這組"}</button></div>
+  </div>`;
+  $("#seqSel").onchange=e=>{curId=+e.target.value;delArm=false;saveSeq()};
+  $("#seqName").oninput=e=>{q.name=e.target.value.trim()||"未命名序列";persist();renderDock();const o=$("#seqSel").selectedOptions[0];if(o)o.textContent=`${q.name}（${q.items.length} 式）`};
+}
+$("#seqOpen").onclick=()=>{delArm=false;renderSeqSheet();$("#seqSheet").hidden=false};
+$("#seqSheet").onclick=e=>{
+  const s=$("#seqSheet"),q=cur(),it=q.items;
+  if(e.target===s||e.target.closest("[data-close]")){s.hidden=true;return}
+  const mv=e.target.closest("[data-mv]"),rm=e.target.closest("[data-rm]"),dm=e.target.closest("[data-dm]");
+  const id=e.target.id;if(id!=="sDel")delArm=false;
+  if(dm){const [i,d]=dm.dataset.dm.split(",").map(Number);let k=MINS.indexOf(it[i].min);if(k<0)k=MINS.findIndex(m=>m>=it[i].min);k=Math.max(0,Math.min(MINS.length-1,k+d));it[i].min=MINS[k];saveSeq()}
+  else if(mv){const [i,d]=mv.dataset.mv.split(",").map(Number);const j=i+d;if(j<0||j>=it.length)return;[it[i],it[j]]=[it[j],it[i]];saveSeq()}
+  else if(rm){it.splice(+rm.dataset.rm,1);saveSeq()}
+  else if(id==="sClear"){q.items=[];saveSeq()}
+  else if(id==="sNew"){const n={id:Date.now(),name:`我的序列 ${seqs.length+1}`,items:[]};seqs.push(n);curId=n.id;saveSeq();toast("已新增序列，可以直接改名");setTimeout(()=>{const el=$("#seqName");el&&el.select()},50)}
+  else if(id==="sDel"){if(seqs.length<2)return;if(!delArm){delArm=true;renderSeqSheet();return}
+    const name=q.name;seqs=seqs.filter(x=>x.id!==curId);curId=seqs[0].id;delArm=false;saveSeq();toast(`已刪除「${name}」`)}
+  else if(id==="sPlay"){s.hidden=true;startPlayer(it)}
+};
+$("#seqPlay").onclick=()=>startPlayer(cur().items);
+
+/* ---------- 播放器 ---------- */
+let pl=null,wake=null;
+function startPlayer(items){
+  if(!items.length)return;
+  const segs=[];
+  items.forEach(x=>{const p=byId[x.id],h=x.min*60;if(p.sides){segs.push({p,side:1,hold:h});segs.push({p,side:2,hold:h})}else segs.push({p,side:0,hold:h})});
+  pl={segs,i:0,left:segs[0].hold,paused:false,run:0,phase:""};
+  const el=$("#player");el.hidden=false;document.body.style.overflow="hidden";
+  el.innerHTML=`<div class="bar"><button class="x" id="pClose" aria-label="結束練習">×</button><div class="prog"><i id="pProg"></i></div><span id="pCount"></span></div>
+    <div class="stage"><div class="phase" id="pPhase"></div><h3 id="pName"></h3>
+      <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="var(--line)" stroke-width="5"/>
+        <circle id="pArc" cx="50" cy="50" r="45" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="282.74" stroke-dashoffset="0"/></svg><div class="t" id="pTime"></div></div>
+      <div class="steps" id="pSteps"></div><div class="next" id="pNext"></div></div>
+    <div class="ctrls"><button id="pPrev" aria-label="上一式">⏮</button><button class="play" id="pPause" aria-label="暫停">❚❚</button><button id="pNextBtn" aria-label="下一式">⏭</button></div>`;
+  $("#pClose").onclick=stopPlayer;
+  $("#pPause").onclick=togglePause;
+  $("#pPrev").onclick=()=>jump(-1);
+  $("#pNextBtn").onclick=()=>jump(1);
+  try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{})}catch(e){}
+  runSeg();
+}
+function fmt(s){s=Math.max(0,Math.ceil(s));return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}
+function drawPlayer(){
+  const s=pl.segs[pl.i],p=s.p;
+  $("#pCount").textContent=`${pl.i+1} / ${pl.segs.length}`;
+  $("#pProg").style.width=`${(pl.i/pl.segs.length)*100}%`;
+  $("#pPhase").textContent=pl.phase;
+  $("#pName").textContent=p.zh+(s.side===1?"・第一邊":s.side===2?"・第二邊":"");
+  $("#pSteps").innerHTML=p.steps.join("<br>");
+  const nx=pl.segs[pl.i+1];$("#pNext").textContent=nx?`下一個：${nx.p.zh}${nx.side===2?"（換邊）":""}`:"這是最後一式";
+  $("#pTime").textContent=fmt(pl.left);
+  $("#pArc").setAttribute("stroke-dashoffset",282.74*(1-pl.left/s.hold));
+}
+async function runSeg(){
+  const run=++pl.run;const s=pl.segs[pl.i],p=s.p;const alive=()=>pl&&pl.run===run;
+  pl.left=s.hold;pl.phase="進入姿勢";drawPlayer();
+  stopSpeech();
+  if(s.side===2)await speak(`換另一邊。${p.steps[p.steps.length>1?1:0]}`);
+  else await speak(`${pl.segs.length>1?`第${pl.i+1}個，`:""}${p.zh}。${p.steps.join("")}`);
+  if(!alive())return;
+  while(pl.paused){await wait(200);if(!alive())return}
+  pl.phase="停留・自然呼吸";drawPlayer();
+  speak(s.hold<60?`現在開始停留${Math.round(s.hold)}秒，自然呼吸。`:`現在開始停留${Math.round(s.hold/60*10)/10}分鐘，放鬆，自然呼吸。`);
+  let last=performance.now(),saidMid=false,saidEnd=false,warned=false;
+  while(pl.left>0){
+    await wait(250);if(!alive())return;
+    const now=performance.now();if(!pl.paused)pl.left-=(now-last)/1000;last=now;
+    if(!saidMid&&s.hold>=120&&pl.left<=s.hold/2){saidMid=true;speak("留意身體哪裡還在用力，讓它軟下來。")}
+    if(!saidEnd&&s.hold>=60&&pl.left<=Math.max(15,warnSec+8)&&pl.left>warnSec){saidEnd=true;speak("準備慢慢離開這個姿勢。")}
+    if(!warned&&warnSec>0&&s.hold>warnSec+3&&pl.left<=warnSec&&!pl.paused){warned=true;ding()}
+    drawPlayer();
+  }
+  chime();
+  if(pl.i<pl.segs.length-1){
+    const nx=pl.segs[pl.i+1];
+    pl.phase=nx.side===2?"換邊":"慢慢離開，稍作休息";drawPlayer();
+    if(nx.side!==2){await speak("慢慢離開，休息一下。");await wait(4000)}else await wait(1500);
+    if(!alive())return;pl.i++;runSeg();
+  }else{
+    pl.phase="練習完成";$("#pProg").style.width="100%";drawPlayer();
+    $("#pName").textContent="練習完成";$("#pTime").textContent="✓";$("#pNext").textContent="記得多喝水。";
+    speak("練習完成。慢慢回到坐姿，記得多喝水。");
+  }
+}
+function togglePause(){
+  pl.paused=!pl.paused;$("#pPause").textContent=pl.paused?"▶":"❚❚";$("#pPause").setAttribute("aria-label",pl.paused?"繼續":"暫停");
+  if(pl.paused){stopSpeech();pl.phase="已暫停"}else pl.phase="停留・自然呼吸";drawPlayer();
+}
+function jump(d){const j=pl.i+d;if(j<0||j>=pl.segs.length)return;pl.i=j;pl.paused=false;$("#pPause").textContent="❚❚";runSeg()}
+function stopPlayer(){if(pl)pl.run++;pl=null;stopSpeech();$("#player").hidden=true;document.body.style.overflow="";try{wake&&wake.release()}catch(e){}wake=null}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#player").hidden)stopPlayer();else{closeDetail();$("#seqSheet").hidden=true}}});
+
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,1600)}
+
+/* iPhone：第一次觸碰時解鎖音訊 */
+let unlocked=false;
+function unlockAudio(){
+  if(unlocked)return;unlocked=true;
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+  try{ac()}catch(e){}
+  try{if(synth){const u=new SpeechSynthesisUtterance(" ");u.volume=0;synth.speak(u)}}catch(e){}
+}
+["touchend","pointerup","click","keydown"].forEach(ev=>document.addEventListener(ev,unlockAudio,{capture:true,passive:true}));
+renderList();renderDock();
+</script>
+
+</body>
+</html>
