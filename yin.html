@@ -833,13 +833,14 @@ async function runSeg(){
     drawPlayer();
   }
   endSound();
-  if(pl.i<pl.segs.length-1){
-    const nx=pl.segs[pl.i+1];
-    pl.ph=nx.side===2?"sw":"rest";drawPlayer();
-    if(nx.side!==2){await speak(L().rest);await wait(4000)}else await wait(1500);
+  const isLast=pl.i>=pl.segs.length-1,nx=pl.segs[pl.i+1];
+  pl.ph=isLast?"done":nx.side===2?"sw":"rest";drawPlayer();
+  /* 讓最後一聲叮和頌缽先響完，再開口說話 */
+  await wait(useBell()?3000:1200);if(!alive())return;
+  if(!isLast){
+    if(nx.side!==2){await speak(L().rest);if(!alive())return;await wait(4000)}
     if(!alive())return;pl.i++;runSeg();
   }else{
-    pl.ph="done";drawPlayer();
     speak(L().done);
   }
 }
