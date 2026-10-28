@@ -340,10 +340,12 @@ function speakOne(text,gen){
 async function speak(text){
   if(!synth){toast("這個瀏覽器不支援語音朗讀");return}
   const gen=speechGen;
+  if(Date.now()-justCancelled<300){await wait(250);if(gen!==speechGen)return}
   const parts=text.split(/(?<=[。！？；])/).map(s=>s.trim()).filter(Boolean);
   for(const p of parts){if(gen!==speechGen)return;await speakOne(p,gen)}
 }
-function stopSpeech(){speechGen++;if(synth)synth.cancel()}
+let justCancelled=0;
+function stopSpeech(){speechGen++;if(synth&&(synth.speaking||synth.pending)){synth.cancel();justCancelled=Date.now()}}
 
 /* 鈴聲：結束前「叮叮」＋結束時頌缽 */
 let actx=null,master=null;
