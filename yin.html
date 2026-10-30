@@ -133,6 +133,12 @@ h2 small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:4
 .fig .pf{fill:var(--warm);fill-opacity:.3}
 .sheet .pic{margin-top:12px}
 .stage .pic{width:min(260px,62vw);max-width:100%;--c:var(--accent);--cbg:var(--surface)}
+.anim-wrap{position:relative}
+.replay{position:absolute;right:8px;bottom:8px;border:0;border-radius:999px;padding:4px 10px;font-size:12.5px;background:var(--surface);color:var(--ink);opacity:.9}
+.halo{position:absolute;left:50%;top:50%;width:70%;aspect-ratio:1;border-radius:50%;background:var(--accent);opacity:.08;transform:translate(-50%,-50%) scale(.7);pointer-events:none}
+.stage .anim-wrap{width:min(260px,62vw);max-width:100%}
+.stage .anim-wrap .pic{width:100%;position:relative;background:transparent}
+.breath{font-size:13px;letter-spacing:.2em;color:var(--accent);min-height:1.4em;transition:opacity .4s}
 /* 播放器 */
 .player{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;
   padding:calc(16px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));overflow:auto}
@@ -440,9 +446,9 @@ function ik(B,E,l1,l2,bend){
   const a=(l1*l1-l2*l2+d*d)/(2*d),h=Math.sqrt(Math.max(0,l1*l1-a*a));
   const J=[B[0]+ux*a+uy*h*bend,B[1]+uy*a-ux*h*bend];return [J,E];
 }
-function figSVG(id,cls){
-  const f=FIG[id];if(!f)return "";
-  const H=f.hip,dt=dirv(f.t),S=[H[0]+dt[0]*LEN.T,H[1]+dt[1]*LEN.T];
+function figSVG(id,cls){return FIG[id]?poseSVG(FIG[id],cls):""}
+function poseSVG(f,cls){
+  const H=f.hip,dt=dirv(f.t),TL=LEN.T*(f.tl||1),S=[H[0]+dt[0]*TL,H[1]+dt[1]*TL];
   const ha=f.t+(f.hd||0),dh=dirv(ha),Hd=[S[0]+dh[0]*LEN.N,S[1]+dh[1]*LEN.N];
   const face=dirv(ha+(f.pr?90:-90)),eye=[Hd[0]+face[0]*2.4+dh[0]*0.8,Hd[1]+face[1]*2.4+dh[1]*0.8];
   const c=f.c||0,M=[(H[0]+S[0])/2+dt[1]*c,(H[1]+S[1])/2-dt[0]*c];
@@ -461,6 +467,74 @@ function figSVG(id,cls){
     <line class="floor" x1="10" y1="72.6" x2="110" y2="72.6"/>${props}${far}
     <path class="near" d="M${pt(H)} Q${pt(M)} ${pt(S)}"/><line class="near" x1="${S[0].toFixed(1)}" y1="${S[1].toFixed(1)}" x2="${(S[0]+dh[0]*2.4).toFixed(1)}" y2="${(S[1]+dh[1]*2.4).toFixed(1)}"/>
     ${near}<circle class="hd" cx="${Hd[0].toFixed(1)}" cy="${Hd[1].toFixed(1)}" r="${LEN.R}"/><circle class="eye" cx="${eye[0].toFixed(1)}" cy="${eye[1].toFixed(1)}" r="0.9"/></svg>`;
+}
+
+/* ---------- 小動畫：進入姿勢、暖身動態、呼吸 ---------- */
+const RM=(()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}})();
+const START_KIND={1:"tableR",2:"stand",3:"tableR",4:"sit",5:"sit",6:"stand",7:"stand",8:"tableR",9:"lie",10:"lie",11:"tableL",12:"sit",13:"lie",14:"sit",15:"tableR",16:"tableR",17:"lie",18:"sit",19:"sit",20:"sit",21:"sit",22:"stand",23:"tableR",24:"sit",25:"tableR",26:"lie",27:"sit",28:"tableR",29:"lie",30:"wall",31:"tableR",32:"tableL",33:"flat",34:"tableR",35:"lie",36:"lie",37:"lie",38:"sit",39:"tableL",40:"sit",41:"sit",42:"sit",43:"tableR",44:"tableR",45:"lie",46:"flat",47:"tableL",48:"stand",49:"lie",50:"lie",51:"lie",52:"tableR",53:"tableR",54:"sit",55:"tableR",56:"lie",57:"lie",58:"tableL",59:"lie",60:"lie"};
+function startPose(id){
+  const f=FIG[id],x=f.hip[0],k=START_KIND[id];
+  if(k==="stand")return {hip:[x,34],t:90,legs:[[x-1,72,1],[x+1,72,1]],arms:[[x-1,61,-1],[x+1,61,-1]]};
+  if(k==="sit")return {hip:[x,68],t:90,legs:[[x+37,70,1],[x+36,70,1]],arms:[[x+10,70,-1],[x+8,70,-1]]};
+  if(k==="tableR")return {hip:[x,51],t:18,legs:[[x-18,71,1],[x-16,71,1]],arms:[[x+23,71,-1],[x+25,71,-1]]};
+  if(k==="tableL")return {hip:[x,51],t:162,pr:1,legs:[[x+18,71,-1],[x+16,71,-1]],arms:[[x-23,71,1],[x-25,71,1]]};
+  if(k==="lie")return {hip:[x,68],t:90,legs:[[x+26,71,1],[x+24,71,1]],arms:[[x+12,64,-1],[x+10,64,-1]]};
+  if(k==="flat")return {hip:[64,67],t:180,legs:[[101,70,1],[100,70,1]],arms:[[91,69,1],[91,69.8,1]]};
+  if(k==="wall")return {hip:[76,68],t:90,legs:[[83,56,1],[82,58,1]],arms:[[86,66,-1],[84,66,-1]],props:[["wall",84]]};
+  return f;
+}
+/* 暖身的循環動作：每格 [姿勢差異, 秒數] */
+const FLOW={
+ 1:[[{},2.5],[{hip:[50,57],t:106},2.5]],
+ 2:[[{t:90,c:0,hd:0,hip:[62,34]},1],[{t:88,c:0,hd:-18,hip:[62,34]},1],[{t:84,c:-4,hd:-8,hip:[62,34]},1],[{t:88,c:-2,hd:0,hip:[65,34]},1],[{t:92,c:2,hd:4,hip:[63,34]},1]],
+ 3:[[{t:18,c:-4,hd:22},3.5],[{t:18,c:7,hd:-35},3.5]],
+ 4:[[{t:84,c:-4},1.6],[{t:90,c:2},1.6],[{t:94,c:4},1.6],[{t:90,c:0},1.6]],
+ 5:[[{hd:-30},1.6],[{hd:-10},1.6],[{hd:14},1.6],[{hd:0},1.6]],
+ 6:[[{hip:[65,36],t:96},1.6],[{hip:[61,35],t:90},1.6],[{hip:[58,36],t:84},1.6],[{hip:[61,35],t:90},1.6]],
+ 7:[[{t:-70,c:4,hd:-10},2],[{t:20,c:7,hd:-55},2.5],[{t:90,c:0,hd:0},2],[{t:20,c:7,hd:-55},2.5]],
+ 8:[[{hip:[42,51],t:18},2],[{hip:[48,51],t:14},2],[{hip:[36,51],t:22},2]]
+};
+const ang=(a,b,k)=>{let d=((b-a)%360+540)%360-180;return a+d*k};
+const L2=(a,b,k)=>a+(b-a)*k;
+const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+function lerpPose(A,B,k){
+  const pt=(p,q)=>[L2(p[0],q[0],k),L2(p[1],q[1],k),q[2]];
+  return {hip:[L2(A.hip[0],B.hip[0],k),L2(A.hip[1],B.hip[1],k)],t:ang(A.t,B.t,k),c:L2(A.c||0,B.c||0,k),hd:L2(A.hd||0,B.hd||0,k),pr:k<.5?A.pr:B.pr,
+    legs:[pt(A.legs[0],B.legs[0]),pt(A.legs[1],B.legs[1])],arms:[pt(A.arms[0],B.arms[0]),pt(A.arms[1],B.arms[1])],props:B.props,tl:L2(A.tl||1,B.tl||1,k)};
+}
+const withP=(f,d)=>Object.assign({},f,d);
+function flowPose(id,t){
+  const fl=FLOW[id],base=FIG[id],total=fl.reduce((s,x)=>s+x[1],0);let p=t%total,i=0;
+  while(p>fl[i][1]){p-=fl[i][1];i++}
+  const A=withP(base,fl[i][0]),B=withP(base,fl[(i+1)%fl.length][0]);
+  return lerpPose(A,B,ease(Math.min(1,p/fl[i][1])));
+}
+/* 呼吸：吸 4 秒、吐 6 秒；回傳 0（吐完）～1（吸飽） */
+function breathAt(t){const p=t%10;return p<4?0.5-0.5*Math.cos(Math.PI*p/4):0.5+0.5*Math.cos(Math.PI*(p-4)/6)}
+function breathPose(id,b){return withP(FIG[id],{tl:1+0.05*b,c:(FIG[id].c||0)+(FIG[id].pr?0:0.8*b)})}
+/* 動畫播放器：把一個元素綁上一段動畫 */
+function Animator(el){
+  let raf=0,last=0;
+  return {
+    run(fn){this.stop();const t0=performance.now();
+      const step=now=>{if(!el.isConnected){this.stop();return}
+        if(now-last>=33){last=now;if(fn((now-t0)/1000)===false){raf=0;return}}
+        raf=requestAnimationFrame(step)};
+      raf=requestAnimationFrame(step)},
+    stop(){if(raf)cancelAnimationFrame(raf);raf=0}
+  };
+}
+/* 進入姿勢 → 然後暖身循環或呼吸 */
+function playPose(an,el,id,opt={}){
+  const S=startPose(id),E=FIG[id],T=opt.skipEnter||RM?0:3.2,onBreath=opt.onBreath;
+  if(RM){el.innerHTML=figSVG(id);onBreath&&onBreath(null);return}
+  an.run(t=>{
+    if(t<T){el.innerHTML=poseSVG(lerpPose(S,E,ease(t/T)));onBreath&&onBreath(null);return}
+    const u=t-T;
+    if(opt.still){el.innerHTML=figSVG(id);return false}
+    if(FLOW[id]){el.innerHTML=poseSVG(flowPose(id,u));onBreath&&onBreath(null)}
+    else{const b=breathAt(u);el.innerHTML=poseSVG(breathPose(id,b));onBreath&&onBreath(b,u%10<4)}
+  });
 }
 
 const CAT=id=>id<=8?"warm":id>=57?"rest":"pose";
@@ -707,23 +781,26 @@ document.addEventListener("click",e=>{
 });
 
 /* ---------- 詳細卡 ---------- */
+let dAnim={stop(){}};
 function openDetail(p){
   const d=$("#detail");const inSeq=inCur(p.id);
   d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${nm(p)}">
     <div class="hd"><div class="card" data-cat="${p.cat}" style="padding:0;border:0;box-shadow:none;background:none"><div class="num">${p.id}</div></div>
       <div><h3>${nm(p)}</h3><div class="en" style="color:var(--muted)">${nm2(p)}</div></div><button class="x" data-close aria-label="關閉">×</button></div>
     <div class="meta" style="margin-top:10px"><span class="chip">${CATN[p.cat]}</span><span class="chip">${p.area}</span><span class="chip">建議停留 ${p.hold} 分</span>${p.sides?'<span class="chip">左右各一次</span>':""}</div>
-    <div class="card" data-cat="${p.cat}" style="padding:0;border:0;box-shadow:none;background:none"><div class="pic">${figSVG(p.id)}</div></div>
+    <div class="card anim-wrap" data-cat="${p.cat}" style="padding:0;border:0;box-shadow:none;background:none"><div class="pic" id="dPic">${figSVG(p.id)}</div><button class="replay" id="dReplay">↻ ${lang==="en"?"Replay":"重播"}</button></div>
     <ol>${stepsOf(p).map(s=>`<li>${s}</li>`).join("")}</ol>
     <div class="caution"><b>${L().caution}　</b>${cautionOf(p)}</div>
     <div class="acts"><button class="primary" id="dPlay">${L().readSteps}</button><button id="dTimer">計時練習 ${holdOf(p)} 分</button><button id="dAdd">${inSeq?"從序列移除":"＋ 加入序列"}</button></div>
   </div>`;
   d.hidden=false;
+  dAnim.stop();dAnim=Animator($("#dPic"));playPose(dAnim,$("#dPic"),p.id);
+  $("#dReplay").onclick=()=>playPose(dAnim,$("#dPic"),p.id);
   $("#dPlay").onclick=()=>sayCard(p);
   $("#dTimer").onclick=()=>{closeDetail();startPlayer([{id:p.id,min:holdOf(p)}])};
-  $("#dAdd").onclick=()=>{toggleSeq(p.id);openDetail(p)};
+  $("#dAdd").onclick=()=>{toggleSeq(p.id);const b=$("#dAdd");b.textContent=inCur(p.id)?"從序列移除":"＋ 加入序列"};
 }
-function closeDetail(){$("#detail").hidden=true;stopSpeech()}
+function closeDetail(){$("#detail").hidden=true;stopSpeech();dAnim.stop()}
 $("#detail").onclick=e=>{if(e.target.id==="detail"||e.target.closest("[data-close]"))closeDetail()};
 
 /* ---------- 序列（可存多組，每式各自設定時間） ---------- */
@@ -772,7 +849,18 @@ $("#seqSheet").onclick=e=>{
 $("#seqPlay").onclick=()=>startPlayer(cur().items);
 
 /* ---------- 播放器 ---------- */
-let pl=null,wake=null;
+let pl=null,wake=null,pAnim={stop(){}};
+function setBreath(b,inhale){
+  const h=$("#pHalo"),t=$("#pBreath");if(!h||!t)return;
+  const holding=pl&&pl.ph==="hold";
+  if(b===null||!holding){h.style.transform="translate(-50%,-50%) scale(.7)";t.textContent="";return}
+  h.style.transform=`translate(-50%,-50%) scale(${(0.7+0.45*b).toFixed(3)})`;
+  t.textContent=lang==="en"?(inhale?"INHALE":"EXHALE"):(inhale?"吸 氣":"吐 氣");
+}
+function pAnimStart(id,skipEnter){
+  const el=$("#pPic");if(!el)return;pAnim.stop();pAnim=Animator(el);
+  playPose(pAnim,el,id,{skipEnter,onBreath:setBreath});
+}
 function startPlayer(items){
   if(!items.length)return;
   const segs=[];
@@ -780,7 +868,7 @@ function startPlayer(items){
   pl={segs,i:0,left:segs[0].hold,paused:false,run:0,ph:"enter"};
   const el=$("#player");el.hidden=false;document.body.style.overflow="hidden";
   el.innerHTML=`<div class="bar"><button class="x" id="pClose" aria-label="結束練習">×</button><div class="prog"><i id="pProg"></i></div><span id="pCount"></span></div>
-    <div class="stage"><div class="pic" id="pPic"></div><div class="phase" id="pPhase"></div><h3 id="pName"></h3>
+    <div class="stage"><div class="anim-wrap"><div class="halo" id="pHalo"></div><div class="pic" id="pPic"></div></div><div class="breath" id="pBreath"></div><div class="phase" id="pPhase"></div><h3 id="pName"></h3>
       <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="var(--line)" stroke-width="5"/>
         <circle id="pArc" cx="50" cy="50" r="45" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="282.74" stroke-dashoffset="0"/></svg><div class="t" id="pTime"></div></div>
       <div class="steps" id="pSteps"></div><div class="next" id="pNext"></div></div>
@@ -800,7 +888,7 @@ function drawPlayer(){
   $("#pProg").style.width=`${(pl.i/pl.segs.length)*100}%`;
   $("#pPhase").textContent=l.ph[pl.ph]||"";
   if(pl.ph==="done"){$("#pProg").style.width="100%";$("#pName").textContent=l.doneT;$("#pTime").className="t";$("#pTime").textContent="✓";$("#pNext").textContent=l.water;$("#pSteps").innerHTML="";return}
-  const pic=$("#pPic");if(pic.dataset.id!==String(p.id)){pic.innerHTML=figSVG(p.id);pic.dataset.id=p.id}
+  const pic=$("#pPic"),key=p.id+":"+pl.i;if(pic.dataset.key!==key){pic.dataset.key=key;pAnimStart(p.id,s.side===2)}
   $("#pName").textContent=nm(p)+(s.side===1?l.s1:s.side===2?l.s2:"");
   $("#pSteps").innerHTML=stepsOf(p).join("<br>");
   const nx=pl.segs[pl.i+1];$("#pNext").textContent=nx?`${l.next}${nm(nx.p)}${nx.side===2?l.nextSw:""}`:l.last;
@@ -850,7 +938,7 @@ function togglePause(){
   if(pl.paused){stopSpeech();pl.prev=pl.ph;pl.ph="paused"}else pl.ph=pl.prev||"hold";drawPlayer();
 }
 function jump(d){const j=pl.i+d;if(j<0||j>=pl.segs.length)return;pl.i=j;pl.paused=false;$("#pPause").textContent="❚❚";runSeg()}
-function stopPlayer(){if(pl)pl.run++;pl=null;stopSpeech();$("#player").hidden=true;document.body.style.overflow="";try{wake&&wake.release()}catch(e){}wake=null}
+function stopPlayer(){pAnim.stop();if(pl)pl.run++;pl=null;stopSpeech();$("#player").hidden=true;document.body.style.overflow="";try{wake&&wake.release()}catch(e){}wake=null}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#player").hidden)stopPlayer();else{closeDetail();$("#seqSheet").hidden=true}}});
 
 let tt;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,1600)}
